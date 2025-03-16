@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat con Gemini 2.0 Flash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-robot"></i> Chat con Gemini 2.0 Flash</h1>
+            <button id="toggleConfig" class="icon-button" title="Configuración">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <main>
+            <div id="chat-container">
+                <div id="chat"></div>
+                <div id="typing-indicator" class="hidden">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="input" placeholder="Escribe tu mensaje aquí..." />
+                <button id="sendBtn" class="icon-button" title="Enviar mensaje">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <div class="controls">
+                <button id="startBtn" class="control-button">
+                    <i class="fas fa-microphone"></i> Hablar con Gemini
+                </button>
+                <button id="pauseBtn" class="control-button" disabled>
+                    <i class="fas fa-pause"></i> Pausar
+                </button>
+                <button id="resumeBtn" class="control-button" disabled>
+                    <i class="fas fa-play"></i> Reanudar
+                </button>
+                <button id="stopBtn" class="control-button" disabled>
+                    <i class="fas fa-stop"></i> Detener
+                </button>
+            </div>
+        </main>
+
+        <aside id="configMenu" class="hidden">
+            <div class="config-header">
+                <h3>Configuración</h3>
+                <button id="closeConfig" class="icon-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="config-section">
+                <h4>Voz</h4>
+                <label for="voiceSelect">Seleccionar Voz:</label>
+                <select id="voiceSelect"></select>
+            </div>
+
+            <div class="config-section">
+                <h4>Velocidad</h4>
+                <div class="slider-container">
+                    <i class="fas fa-walking"></i>
+                    <input type="range" id="rateSelect" min="0.1" max="2" step="0.1" value="1">
+                    <i class="fas fa-running"></i>
+                </div>
+                <span id="rateValue">1.0</span>
+            </div>
+
+            <div class="config-section">
+                <h4>Tono</h4>
+                <div class="slider-container">
+                    <i class="fas fa-arrow-down"></i>
+                    <input type="range" id="pitchSelect" min="0" max="2" step="0.1" value="1">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <span id="pitchValue">1.0</span>
+            </div>
+
+            <div class="config-section">
+                <h4>Tema</h4>
+                <div class="theme-toggle">
+                    <span>Claro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Oscuro</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Cargar Howler.js para sonidos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="hora.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
