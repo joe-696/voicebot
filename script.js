@@ -6,8 +6,10 @@ let recognitionTimeout = null;
 let voices = [];
 let isWaitingForResponse = false;
 
-// Array para almacenar el contexto (historial) de la conversación
-const conversationContext = [];
+// Array para almacenar el historial de la conversación (contexto)
+let conversationHistory = [];
+// Máximo número de mensajes para mantener como contexto (ajusta según necesidades)
+const MAX_CONTEXT_LENGTH = 10;
 
 // Elementos DOM
 const chatElement = document.getElementById('chat');
@@ -27,6 +29,7 @@ const configMenu = document.getElementById('configMenu');
 const closeConfigBtn = document.getElementById('closeConfig');
 const themeToggle = document.getElementById('themeToggle');
 const typingIndicator = document.getElementById('typing-indicator');
+const clearContextBtn = document.getElementById('clearContextBtn');
 
 // Sonidos de interfaz
 const sounds = {
@@ -71,6 +74,36 @@ function loadSavedConfig() {
     // Actualizar displays
     rateValue.textContent = savedRate;
     pitchValue.textContent = savedPitch;
+    
+    // Cargar historial de conversación si existe
+    const savedHistory = localStorage.getItem('conversationHistory');
+    if (savedHistory) {
+        try {
+            conversationHistory = JSON.parse(savedHistory);
+            // Restaurar los mensajes previos en la interfaz
+            restoreConversationHistory();
+        } catch (e) {
+            console.error("Error al cargar el historial de conversación:", e);
+            conversationHistory = [];
+        }
+    }
+}
+
+// Restaurar historial de conversación en la interfaz
+function restoreConversationHistory() {
+    // Limpiar chat actual
+    chatElement.innerHTML = '';
+    
+    // Restaurar mensajes del historial
+    conversationHistory.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message.text;
+        messageDiv.className = `message ${message.role === 'user' ? 'user-message' : 'bot-message'}`;
+        chatElement.appendChild(messageDiv);
+    });
+    
+    // Scroll al final
+    chatElement.scrollTop = chatElement.scrollHeight;
 }
 
 // Obtener las voces disponibles para TTS
@@ -100,27 +133,68 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 }
 loadVoices();
 
-// Función para añadir mensajes al chat y al contexto
-function appendMessage(message, className) {
+// Función para añadir mensajes al chat
+function appendMessage(message, className, isSystemMessage = false) {
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
     messageDiv.className = `message ${className}`;
+    
+    if (isSystemMessage) {
+        messageDiv.classList.add('system-message');
+    } else {
+        // Almacenar en historial solo si no es mensaje del sistema
+        const role = className === 'user-message' ? 'user' : 'model';
+        conversationHistory.push({ role, text: message });
+        
+        // Limitar el tamaño del historial para no sobrecargar la memoria
+        if (conversationHistory.length > MAX_CONTEXT_LENGTH) {
+            conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_CONTEXT_LENGTH);
+        }
+        
+        // Guardar historial actualizado
+        localStorage.setItem('conversationHistory', JSON.stringify(conversationHistory));
+        
+        // Actualizar indicador de contexto
+        updateContextIndicator();
+    }
+    
     chatElement.appendChild(messageDiv);
     chatElement.scrollTop = chatElement.scrollHeight;
     
-    // Añadir al contexto de conversación
-    conversationContext.push({
-        text: message,
-        type: className
-    });
-    
     // Reproducir sonido según tipo de mensaje
-    if (className === 'user-message') {
+    if (className === 'user-message' && !isSystemMessage) {
         sounds.send.play();
-    } else if (className === 'bot-message') {
+    } else if (className === 'bot-message' && !isSystemMessage) {
         sounds.receive.play();
         readAloud(message);
     }
+}
+
+// Actualizar indicador de contexto
+function updateContextIndicator() {
+    const indicator = document.getElementById('contextIndicator');
+    if (indicator) {
+        indicator.textContent = `Contexto: ${conversationHistory.length} mensajes`;
+        // Visualización de "memoria" basada en cantidad de contexto
+        if (conversationHistory.length === 0) {
+            indicator.classList.remove('medium', 'full');
+            indicator.classList.add('empty');
+        } else if (conversationHistory.length < MAX_CONTEXT_LENGTH / 2) {
+            indicator.classList.remove('empty', 'full');
+            indicator.classList.add('medium');
+        } else {
+            indicator.classList.remove('empty', 'medium');
+            indicator.classList.add('full');
+        }
+    }
+}
+
+// Limpiar contexto
+function clearContext() {
+    conversationHistory = [];
+    localStorage.removeItem('conversationHistory');
+    updateContextIndicator();
+    appendMessage('Contexto de la conversación eliminado. Estamos comenzando una nueva conversación.', 'bot-message', true);
 }
 
 // Mostrar indicador de "escribiendo..."
@@ -158,6 +232,14 @@ function sendMessage(userInput) {
         }
     }
     
+    // Verificar comandos especiales
+    if (userInput.toLowerCase() === "borrar contexto" || 
+        userInput.toLowerCase() === "olvidar conversación" ||
+        userInput.toLowerCase() === "nueva conversación") {
+        clearContext();
+        return;
+    }
+    
     // Mostrar indicador de "escribiendo..."
     showTypingIndicator();
     isWaitingForResponse = true;
@@ -165,20 +247,15 @@ function sendMessage(userInput) {
     // Actualizar estado de los botones
     updateButtonStates();
     
-    // Enviar solicitud a Gemini con el historial de contexto
-    const formattedContext = conversationContext.map(msg => {
-        // Podemos enviar solo texto del usuario o ambos, según sea necesario
-        return { role: msg.type === 'user-message' ? 'user' : 'system', content: msg.text };
-    });
-
+    // Preparar mensajes con contexto para enviar a Gemini
+    const messages = prepareMessagesWithContext();
+    
+    // Enviar solicitud a Gemini
     fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            // Ajustar si la API requiere un formato distinto para enviar contexto
-            contents: [{
-                parts: [{ text: userInput }]
-            }]
+            contents: messages
         })
     })
     .then(response => {
@@ -207,6 +284,32 @@ function sendMessage(userInput) {
         appendMessage('Lo siento, ocurrió un error al comunicarse con Gemini. Por favor, inténtalo de nuevo más tarde.', 'bot-message');
         updateButtonStates();
     });
+}
+
+// Preparar mensajes con contexto para Gemini
+function prepareMessagesWithContext() {
+    const messages = [];
+    
+    // Agregar mensaje de sistema inicial para definir el comportamiento
+    messages.push({
+        role: "user",
+        parts: [{ text: "Eres un asistente virtual amigable y útil llamado Gemini 2.0 Flash. Debes ser conciso en tus respuestas. Responde en español." }]
+    });
+    
+    messages.push({
+        role: "model",
+        parts: [{ text: "Entendido. Soy Gemini 2.0 Flash, un asistente virtual amigable y útil. Responderé de manera concisa y en español. ¿En qué puedo ayudarte hoy?" }]
+    });
+    
+    // Agregar mensajes del historial para mantener contexto
+    conversationHistory.forEach(message => {
+        messages.push({
+            role: message.role === 'user' ? 'user' : 'model',
+            parts: [{ text: message.text }]
+        });
+    });
+    
+    return messages;
 }
 
 // Función para leer texto en voz alta
@@ -381,15 +484,20 @@ themeToggle.addEventListener('change', () => {
     localStorage.setItem('theme', theme);
 });
 
+// Evento para limpiar contexto
+if (clearContextBtn) {
+    clearContextBtn.addEventListener('click', clearContext);
+}
+
 // Mostrar mensaje de bienvenida
 window.addEventListener('DOMContentLoaded', () => {
+    // Inicializar indicador de contexto
+    updateContextIndicator();
+    
     setTimeout(() => {
-        appendMessage('¡Hola! Soy Gemini 2.0 Flash. Puedes hablarme haciendo clic en el botón "Hablar con Gemini" o escribiendo tu mensaje. ¿En qué puedo ayudarte hoy?', 'bot-message');
+        // Solo mostrar mensaje de bienvenida si no hay historial previo
+        if (conversationHistory.length === 0) {
+            appendMessage('¡Hola! Soy Gemini 2.0 Flash. Puedes hablarme haciendo clic en el botón "Hablar con Gemini" o escribiendo tu mensaje. ¿En qué puedo ayudarte hoy?', 'bot-message');
+        }
     }, 500);
 });
-
-// Ejemplo de función para obtener hora (hora.js)
-function obtenerHora() {
-    const now = new Date();
-    return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-}
