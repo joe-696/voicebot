@@ -398,3 +398,37 @@ input:checked + .slider:before {
         max-width: 90%;
     }
 }
+
+
+
+
+/* Añade estos estilos a tu archivo styles.css existente */
+
+.config-section button.control-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f44336;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.config-section button.control-button:hover {
+    background-color: #d32f2f;
+}
+
+[data-theme="dark"] .config-section button.control-button {
+    background-color: #b71c1c;
+}
+
+[data-theme="dark"] .config-section button.control-button:hover {
+    background-color: #d32f2f;
+}
