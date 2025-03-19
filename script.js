@@ -6,6 +6,10 @@ let recognitionTimeout = null;
 let voices = [];
 let isWaitingForResponse = false;
 
+// Configuración del contexto
+const MAX_CONTEXT_MESSAGES = 10;  // Número máximo de mensajes para el contexto
+const MAX_CONTEXT_LENGTH = 2000;  // Longitud máxima en caracteres para evitar exceder límites de token
+
 // Elementos DOM
 const chatElement = document.getElementById('chat');
 const inputField = document.getElementById('input');
@@ -39,6 +43,77 @@ recognition.lang = 'es-ES';
 recognition.interimResults = true;
 recognition.maxAlternatives = 1;
 recognition.continuous = false;
+
+// Manejo del historial de chat y contexto
+let chatHistory = [];
+
+// Cargar historial del chat desde localStorage
+function loadChatHistory() {
+    const savedChat = localStorage.getItem('geminiChatHistory');
+    if (savedChat) {
+        try {
+            chatHistory = JSON.parse(savedChat);
+            
+            // Mostrar mensajes guardados en la interfaz
+            chatHistory.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = msg.text;
+                messageDiv.className = `message ${msg.role === 'user' ? 'user-message' : 'bot-message'}`;
+                chatElement.appendChild(messageDiv);
+            });
+            
+            chatElement.scrollTop = chatElement.scrollHeight;
+        } catch (error) {
+            console.error('Error al cargar el historial del chat:', error);
+            chatHistory = [];
+        }
+    }
+}
+
+// Guardar historial del chat en localStorage
+function saveChatHistory() {
+    localStorage.setItem('geminiChatHistory', JSON.stringify(chatHistory));
+}
+
+// Resumir el contexto para optimizar tokens
+function generateContext() {
+    if (chatHistory.length === 0) return "";
+    
+    // Si hay pocos mensajes, usar todos
+    if (chatHistory.length <= MAX_CONTEXT_MESSAGES) {
+        return chatHistory.map(msg => `${msg.role === 'user' ? 'Usuario' : 'Asistente'}: ${msg.text}`).join('\n\n');
+    }
+    
+    // Si hay muchos mensajes, incluir un resumen y los últimos mensajes
+    let context = "Resumen de la conversación anterior:\n";
+    
+    // Resumir primeros mensajes
+    const oldMessages = chatHistory.slice(0, chatHistory.length - MAX_CONTEXT_MESSAGES);
+    const topics = new Set();
+    oldMessages.forEach(msg => {
+        // Extraer términos clave de cada mensaje (simplificado)
+        const keywords = msg.text.split(/\s+/)
+            .filter(word => word.length > 4)
+            .slice(0, 3);
+        keywords.forEach(word => topics.add(word.toLowerCase()));
+    });
+    
+    context += `La conversación ha tratado sobre: ${Array.from(topics).slice(0, 8).join(", ")}.\n\n`;
+    
+    // Incluir los mensajes más recientes completos
+    context += "Mensajes recientes:\n";
+    const recentMessages = chatHistory.slice(-MAX_CONTEXT_MESSAGES);
+    context += recentMessages.map(msg => `${msg.role === 'user' ? 'Usuario' : 'Asistente'}: ${msg.text}`).join('\n\n');
+    
+    // Truncar si es demasiado largo
+    if (context.length > MAX_CONTEXT_LENGTH) {
+        context = context.substring(context.length - MAX_CONTEXT_LENGTH);
+        // Asegurar que comienza con una frase completa
+        context = '...' + context.substring(context.indexOf('\n') + 1);
+    }
+    
+    return context;
+}
 
 // Cargar tema guardado
 function loadSavedTheme() {
@@ -98,12 +173,19 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 loadVoices();
 
 // Función para añadir mensajes al chat
-function appendMessage(message, className) {
+function appendMessage(message, className, saveToHistory = true) {
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
     messageDiv.className = `message ${className}`;
     chatElement.appendChild(messageDiv);
     chatElement.scrollTop = chatElement.scrollHeight;
+    
+    // Guardar en el historial si se indica
+    if (saveToHistory) {
+        const role = className === 'user-message' ? 'user' : 'assistant';
+        chatHistory.push({ role, text: message });
+        saveChatHistory();
+    }
     
     // Reproducir sonido según tipo de mensaje
     if (className === 'user-message') {
@@ -156,13 +238,21 @@ function sendMessage(userInput) {
     // Actualizar estado de los botones
     updateButtonStates();
     
+    // Generar contexto para la consulta
+    const context = generateContext();
+    
+    // Crear prompt para Gemini incluyendo el contexto
+    const promptWithContext = context ? 
+        `Contexto de la conversación:\n${context}\n\nConsulta actual:\n${userInput}` : 
+        userInput;
+    
     // Enviar solicitud a Gemini
     fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             contents: [{
-                parts: [{ text: userInput }]
+                parts: [{ text: promptWithContext }]
             }]
         })
     })
@@ -366,9 +456,40 @@ themeToggle.addEventListener('change', () => {
     localStorage.setItem('theme', theme);
 });
 
-// Mostrar mensaje de bienvenida
+// Botón para limpiar el historial
+function addClearHistoryButton() {
+    const configSection = document.createElement('div');
+    configSection.className = 'config-section';
+    
+    const clearHistoryBtn = document.createElement('button');
+    clearHistoryBtn.className = 'control-button';
+    clearHistoryBtn.innerHTML = '<i class="fas fa-trash"></i> Borrar historial';
+    clearHistoryBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres borrar todo el historial de chat?')) {
+            chatHistory = [];
+            localStorage.removeItem('geminiChatHistory');
+            chatElement.innerHTML = '';
+            appendMessage('El historial de chat ha sido borrado.', 'bot-message', false);
+            configMenu.classList.add('hidden');
+        }
+    });
+    
+    configSection.appendChild(clearHistoryBtn);
+    configMenu.appendChild(configSection);
+}
+
+// Mostrar mensaje de bienvenida e inicializar
 window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        appendMessage('¡Hola! Soy Gemini 2.0 Flash. Puedes hablarme haciendo clic en el botón "Hablar con Gemini" o escribiendo tu mensaje. ¿En qué puedo ayudarte hoy?', 'bot-message');
-    }, 500);
+    // Cargar historial existente
+    loadChatHistory();
+    
+    // Añadir botón de borrar historial
+    addClearHistoryButton();
+    
+    // Mostrar mensaje de bienvenida solo si no hay historial
+    if (chatHistory.length === 0) {
+        setTimeout(() => {
+            appendMessage('¡Hola! Soy Gemini 2.0 Flash. Puedes hablarme haciendo clic en el botón "Hablar con Gemini" o escribiendo tu mensaje. ¿En qué puedo ayudarte hoy?', 'bot-message');
+        }, 500);
+    }
 });
