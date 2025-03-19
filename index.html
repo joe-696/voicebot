@@ -11,9 +11,14 @@
     <div class="app-container">
         <header>
             <h1><i class="fas fa-robot"></i> Chat con Gemini 2.0 Flash</h1>
-            <button id="toggleConfig" class="icon-button" title="Configuración">
-                <i class="fas fa-cog"></i>
-            </button>
+            <div class="header-controls">
+                <div id="contextIndicator" class="context-indicator empty" title="Cantidad de mensajes en memoria">
+                    Contexto: 0 mensajes
+                </div>
+                <button id="toggleConfig" class="icon-button" title="Configuración">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
         </header>
 
         <main>
@@ -84,6 +89,14 @@
             </div>
 
             <div class="config-section">
+                <h4>Contexto</h4>
+                <button id="clearContextBtn" class="full-width-btn">
+                    <i class="fas fa-trash"></i> Borrar contexto
+                </button>
+                <p class="help-text">Esto eliminará la memoria de la conversación actual.</p>
+            </div>
+
+            <div class="config-section">
                 <h4>Tema</h4>
                 <div class="theme-toggle">
                     <span>Claro</span>
@@ -100,7 +113,6 @@
     <!-- Cargar Howler.js para sonidos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="hora.js"></script>
-    <!-- Se incluye el script principal -->
     <script src="script.js"></script>
 </body>
 </html>
