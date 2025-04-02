@@ -8,24 +8,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
- 
+
     <style>
-        /* Basic Reset */
+        /* --- Basic Reset --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* --- Body Styling & Theme Variables --- */
         body {
-            font-family: 'Inter', sans-serif; /* Use Inter font */
+            font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: var(--bg-color, #f0f2f5);
+            background-color: var(--bg-color, #f0f2f5); /* Default light */
             color: var(--text-color, #333);
             transition: background-color 0.3s, color 0.3s;
-            padding: 1rem; /* Add padding for smaller screens */
+            padding: 1rem; /* Padding for smaller screens */
         }
 
-        /* Theme Variables */
+        /* Light Theme (Default) */
         body[data-theme="light"] {
             --bg-color: #f0f2f5;
             --text-color: #333;
@@ -45,19 +46,22 @@
             --shadow-color: rgba(0, 0, 0, 0.1);
             --stop-listen-bg: #6c757d;
             --stop-listen-hover-bg: #5a6268;
+            --scrollbar-thumb: #007bff;
+            --scrollbar-track: #ffffff;
         }
 
+        /* Dark Theme */
         body[data-theme="dark"] {
             --bg-color: #121212;
             --text-color: #e0e0e0;
             --header-bg: #1e1e1e;
             --chat-bg: #1e1e1e;
             --input-bg: #2c2c2c;
-            --user-msg-bg: #056162;
+            --user-msg-bg: #056162; /* Darker green for user messages */
             --bot-msg-bg: #3a3a3a;
-            --button-bg: #007bff; /* Keep button color consistent or adjust */
+            --button-bg: #0d6efd; /* Slightly brighter blue */
             --button-text: #ffffff;
-            --button-hover-bg: #0056b3;
+            --button-hover-bg: #0b5ed7;
             --icon-color: #bbb;
             --border-color: #444;
             --indicator-color: #555;
@@ -66,20 +70,23 @@
             --shadow-color: rgba(255, 255, 255, 0.1);
             --stop-listen-bg: #6c757d;
             --stop-listen-hover-bg: #5a6268;
+            --scrollbar-thumb: #0d6efd;
+            --scrollbar-track: #1e1e1e;
         }
 
+        /* --- App Structure --- */
         .app-container {
             background-color: var(--header-bg);
-            border-radius: 12px; /* Rounded corners */
+            border-radius: 12px;
             box-shadow: 0 4px 15px var(--shadow-color);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 700px; /* Limit max width */
-            height: 90vh; /* Limit height */
+            max-width: 700px;
+            height: 90vh;
             max-height: 800px;
-            position: relative; /* Needed for config menu positioning */
+            position: relative; /* For config menu positioning */
         }
 
         header {
@@ -88,7 +95,8 @@
             align-items: center;
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            background-color: var(--header-bg); /* Ensure header has bg */
+            background-color: var(--header-bg);
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
 
         header h1 {
@@ -110,7 +118,7 @@
             gap: 1rem;
         }
 
-        /* Context Indicator */
+        /* --- Context Indicator --- */
         .context-indicator {
             font-size: 0.8rem;
             padding: 0.3rem 0.6rem;
@@ -118,18 +126,19 @@
             background-color: var(--indicator-color);
             color: var(--bg-color); /* Contrast text */
             transition: background-color 0.3s;
-            cursor: default; /* Indicate it's not clickable */
+            cursor: default;
+            white-space: nowrap; /* Prevent wrapping */
         }
-        .context-indicator.empty { background-color: #dc3545; } /* Red for empty */
-        .context-indicator.medium { background-color: #ffc107; } /* Yellow for medium */
-        .context-indicator.full { background-color: #28a745; } /* Green for full */
+        .context-indicator.empty { background-color: #dc3545; color: white;} /* Red for empty */
+        .context-indicator.medium { background-color: #ffc107; color: #333;} /* Yellow for medium */
+        .context-indicator.full { background-color: #28a745; color: white;} /* Green for full */
 
-
+        /* --- Main Chat Area --- */
         main {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            padding: 0 1.5rem 1rem; /* Add padding */
+            padding: 0 1.5rem 1rem;
             overflow: hidden; /* Prevent content overflow */
         }
 
@@ -138,25 +147,16 @@
             overflow-y: auto; /* Enable scrolling */
             padding: 1rem 0;
             margin-bottom: 1rem; /* Space before input */
-            display: flex; /* To position typing indicator */
+            display: flex;
             flex-direction: column;
             scrollbar-width: thin; /* Firefox */
-            scrollbar-color: var(--button-bg) var(--chat-bg); /* Firefox */
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); /* Firefox */
         }
 
         /* Webkit Scrollbar Styles */
-        #chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-        #chat-container::-webkit-scrollbar-track {
-            background: var(--chat-bg);
-            border-radius: 4px;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background-color: var(--button-bg);
-            border-radius: 4px;
-            border: 2px solid var(--chat-bg);
-        }
+        #chat-container::-webkit-scrollbar { width: 8px; }
+        #chat-container::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 4px; }
+        #chat-container::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; border: 2px solid var(--scrollbar-track); }
 
         #chat {
             display: flex;
@@ -166,16 +166,18 @@
 
         .message {
             padding: 0.75rem 1rem;
-            border-radius: 12px; /* Rounded messages */
+            border-radius: 12px;
             max-width: 80%;
             word-wrap: break-word;
             line-height: 1.4;
-            position: relative; /* Para posicionar el botón de altavoz */
+            position: relative; /* For speak button */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Subtle shadow */
         }
 
         .user-message {
             background-color: var(--user-msg-bg);
-            color: var(--text-color); /* Adjust if needed for contrast */
+            /* Ensure text color contrasts with background */
+            color: var(--theme, light) == 'light' ? #333 : #e0e0e0;
             align-self: flex-end;
             border-bottom-right-radius: 4px; /* Tail effect */
         }
@@ -185,13 +187,13 @@
             color: var(--text-color);
             align-self: flex-start;
             border-bottom-left-radius: 4px; /* Tail effect */
-            padding-bottom: 2rem; /* Espacio para el botón de altavoz */
+            padding-bottom: 2.2rem; /* Space for the speak button */
         }
 
-        /* Botón de altavoz para mensajes del bot */
+        /* Speak button for bot messages */
         .speak-button {
             position: absolute;
-            bottom: 5px;
+            bottom: 6px; /* Adjusted position */
             right: 10px;
             background: none;
             border: none;
@@ -199,34 +201,37 @@
             font-size: 1rem;
             cursor: pointer;
             opacity: 0.7;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, color 0.2s;
+            padding: 2px; /* Add some clickable area */
         }
+        .speak-button:hover { opacity: 1; }
+        .speak-button.speaking { color: #dc3545; } /* Indicate speaking */
 
-        .speak-button:hover {
-            opacity: 1;
-        }
-
-        /* Información de transcripción en tiempo real */
+        /* --- Transcription Info (Hidden by default via JS now) --- */
         #transcription-info {
-            position: absolute;
-            bottom: 80px;
+            position: absolute; /* Position relative to app-container */
+            bottom: 85px; /* Position above input area */
             left: 50%;
             transform: translateX(-50%);
-            background-color: var(--bot-msg-bg);
-            color: var(--text-color);
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
-            opacity: 0;
+            opacity: 0; /* Hidden by default */
             transition: opacity 0.3s;
-            pointer-events: none;
+            pointer-events: none; /* Don't block clicks */
             z-index: 5;
             max-width: 90%;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: none; /* Initially hidden completely */
         }
-
         #transcription-info.active {
-            opacity: 0.9;
+            opacity: 1; /* Make visible when active */
+            display: block; /* Show the element */
         }
 
         .system-message {
@@ -237,21 +242,20 @@
             background-color: transparent;
             text-align: center;
             margin: 0.5rem 0;
+            padding: 0.2rem 0.5rem;
         }
 
-        /* Typing Indicator */
+        /* --- Typing Indicator --- */
         #typing-indicator {
             display: flex;
             align-items: center;
             padding: 0.5rem 1rem;
-            margin-top: 0.5rem; /* Space from last message */
+            margin-top: 0.5rem;
             align-self: flex-start; /* Align with bot messages */
         }
         #typing-indicator.hidden { display: none; }
         .dot {
-            width: 8px;
-            height: 8px;
-            margin: 0 3px;
+            width: 8px; height: 8px; margin: 0 3px;
             background-color: var(--icon-color);
             border-radius: 50%;
             animation: typing 1.4s infinite ease-in-out both;
@@ -263,14 +267,19 @@
             40% { transform: scale(1.0); }
         }
 
-
+        /* --- Input Area --- */
+        .input-area-container {
+            padding: 0 1.5rem 1rem; /* Match main padding */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
         .input-area {
             display: flex;
             gap: 0.5rem;
             padding: 0.5rem;
             border: 1px solid var(--border-color);
-            border-radius: 25px; /* Pill shape input area */
+            border-radius: 25px; /* Pill shape */
             background-color: var(--input-bg);
+            align-items: center; /* Align items vertically */
         }
 
         #input {
@@ -281,38 +290,34 @@
             font-size: 1rem;
             background-color: transparent;
             color: var(--text-color);
+            line-height: 1.4; /* Ensure text doesn't jump */
         }
-         #input::placeholder {
-            color: var(--icon-color);
-         }
+        #input::placeholder { color: var(--icon-color); opacity: 0.8; }
 
         .icon-button {
-            background: none;
-            border: none;
+            background: none; border: none;
             color: var(--button-bg);
             font-size: 1.25rem;
             cursor: pointer;
             padding: 0.5rem;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0; /* Prevent button shrinking */
         }
-        .icon-button:hover {
-            background-color: rgba(0, 123, 255, 0.1); /* Subtle hover */
-        }
-        .icon-button i {
-            display: block; /* Prevents small layout shifts */
-        }
+        .icon-button:hover { background-color: rgba(0, 123, 255, 0.1); }
+        .icon-button:disabled { color: var(--indicator-color); cursor: not-allowed; background-color: transparent; }
+        .icon-button i { display: block; }
 
-
+        /* --- Control Buttons --- */
         .controls {
             display: flex;
             justify-content: center;
             gap: 0.75rem;
             margin-top: 1rem;
-            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+            padding: 0 1.5rem; /* Match main padding */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         .control-button {
@@ -320,14 +325,12 @@
             color: var(--button-text);
             border: none;
             padding: 0.75rem 1.25rem;
-            border-radius: 20px; /* Rounded buttons */
+            border-radius: 20px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background-color 0.2s, box-shadow 0.2s;
+            display: flex; align-items: center; gap: 0.5rem;
+            transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .control-button:hover:not(:disabled) {
@@ -336,219 +339,122 @@
         }
         .control-button:disabled {
             background-color: var(--indicator-color);
+            color: var(--bg-color);
+            opacity: 0.7;
             cursor: not-allowed;
             box-shadow: none;
         }
-        .control-button i {
-            font-size: 1rem;
-        }
+        .control-button i { font-size: 1rem; }
+
         /* Style for the explicit stop listening button */
-        #explicitStopBtn {
-            background-color: var(--stop-listen-bg);
-        }
-        #explicitStopBtn:hover:not(:disabled) {
-            background-color: var(--stop-listen-hover-bg);
-        }
+        #explicitStopBtn { background-color: var(--stop-listen-bg); }
+        #explicitStopBtn:hover:not(:disabled) { background-color: var(--stop-listen-hover-bg); }
 
-
-        /* Config Menu */
+        /* --- Config Menu --- */
         #configMenu {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 100%;
+            position: absolute; top: 0; right: 0;
+            width: 300px; height: 100%;
             background-color: var(--config-bg);
             border-left: 1px solid var(--config-border);
             box-shadow: -5px 0 15px var(--shadow-color);
             transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out, visibility 0.3s;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             padding: 1.5rem;
             overflow-y: auto; /* Scroll if content overflows */
+            visibility: hidden; /* Start hidden */
         }
         #configMenu:not(.hidden) {
             transform: translateX(0);
-        }
-        #configMenu.hidden {
-            /* Keep hidden state simple */
-             transform: translateX(100%); /* Ensure it's hidden */
-             visibility: hidden; /* Improve accessibility */
+            visibility: visible; /* Make visible */
         }
 
         .config-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
-        .config-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-        .config-header .icon-button {
-            color: var(--icon-color); /* Use subtle color */
-        }
+        .config-header h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
+        .config-header .icon-button { color: var(--icon-color); }
 
-        .config-section {
-            margin-bottom: 1.5rem;
-        }
+        .config-section { margin-bottom: 1.5rem; }
         .config-section h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-color);
+            margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
         }
         .config-section label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-color);
+            display: block; margin-bottom: 0.5rem;
+            font-size: 0.9rem; color: var(--text-color);
         }
         .config-section select,
         .config-section input[type="range"] {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 6px;
+            width: 100%; padding: 0.5rem; border-radius: 6px;
             border: 1px solid var(--border-color);
             background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 0.9rem;
+            color: var(--text-color); font-size: 0.9rem;
         }
-        .config-section input[type="range"] {
-            cursor: pointer;
-            padding: 0; /* Remove padding for range */
-        }
+        .config-section input[type="range"] { cursor: pointer; padding: 0; }
 
-        .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.25rem;
-        }
-        .slider-container i {
-            color: var(--icon-color);
-        }
+        .slider-container { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
+        .slider-container i { color: var(--icon-color); }
         .config-section span[id$="Value"] { /* Select rateValue and pitchValue */
-            display: block;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--icon-color);
-            margin-top: 0.25rem;
+            display: block; text-align: center; font-size: 0.85rem;
+            color: var(--icon-color); margin-top: 0.25rem;
         }
 
         .full-width-btn {
-            width: 100%;
-            background-color: #dc3545; /* Red for destructive action */
-            color: white;
-            border: none;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            width: 100%; background-color: #dc3545; color: white;
+            border: none; padding: 0.75rem 1rem; border-radius: 6px;
+            cursor: pointer; font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             transition: background-color 0.2s;
         }
-        .full-width-btn:hover {
-            background-color: #c82333;
-        }
-        .full-width-btn i {
-            font-size: 1rem;
-        }
-        .help-text {
-            font-size: 0.8rem;
-            color: var(--icon-color);
-            margin-top: 0.5rem;
-            text-align: center;
-        }
+        .full-width-btn:hover { background-color: #c82333; }
+        .full-width-btn i { font-size: 1rem; }
+        .help-text { font-size: 0.8rem; color: var(--icon-color); margin-top: 0.5rem; text-align: center; }
 
         /* Theme Toggle Switch */
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px; /* Adjusted width */
-            height: 28px; /* Adjusted height */
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 28px; /* Fully rounded */
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; /* Adjusted size */
-            width: 20px; /* Adjusted size */
-            left: 4px; /* Adjusted position */
-            bottom: 4px; /* Adjusted position */
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--button-bg);
-        }
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--button-bg);
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px); /* Adjusted translation */
-        }
+        .theme-toggle { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.9rem; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--button-bg); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--button-bg); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Responsive Adjustments */
+        /* --- Responsive Adjustments --- */
         @media (max-width: 600px) {
-            .app-container {
-                height: 100vh; /* Full height on mobile */
-                max-height: none;
-                border-radius: 0;
-                box-shadow: none;
-            }
+            body { padding: 0; } /* Remove body padding on mobile */
+            .app-container { height: 100vh; max-height: none; border-radius: 0; box-shadow: none; }
             header { padding: 0.75rem 1rem; }
             header h1 { font-size: 1.1rem; }
             main { padding: 0 1rem 0.75rem; }
-            .controls { gap: 0.5rem; }
+            .input-area-container { padding: 0 1rem 0.75rem; }
+            .controls { padding: 0 1rem; gap: 0.5rem; }
             .control-button { padding: 0.6rem 1rem; font-size: 0.85rem; }
             #configMenu { width: 85%; }
             .message { max-width: 90%; }
+            #transcription-info { bottom: 130px; /* Adjust position based on controls */ }
         }
+        @media (max-width: 400px) {
+             .control-button { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+             .control-button i { font-size: 0.9rem;}
+             header h1 { font-size: 1rem; gap: 0.3rem;}
+             .header-controls { gap: 0.5rem;}
+             .context-indicator { padding: 0.2rem 0.5rem; font-size: 0.75rem;}
+        }
+
     </style>
 </head>
-<body>
-    <div class="app-container">
+<body data-theme="light"> <div class="app-container">
         <header>
-            <h1><i class="fas fa-robot"></i> Chat con Gemini 2.0 Flash</h1>
+            <h1><i class="fas fa-robot"></i> Chat con Gemini Flash</h1>
             <div class="header-controls">
                 <div id="contextIndicator" class="context-indicator empty" title="Cantidad de mensajes en memoria">
-                    Contexto: 0 mensajes
+                    Contexto: 0
                 </div>
                 <button id="toggleConfig" class="icon-button" title="Configuración">
                     <i class="fas fa-cog"></i>
@@ -558,7 +464,14 @@
 
         <main>
             <div id="chat-container">
-                <div id="chat"></div>
+                <div id="chat">
+                    <div class="message bot-message">
+                        ¡Hola! Soy Gemini. Puedes hablarme usando el botón del micrófono o escribir tu mensaje.
+                        <button class="speak-button" onclick="speakMessage(this.parentElement)" title="Leer mensaje">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
                 <div id="typing-indicator" class="hidden">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -566,46 +479,48 @@
                 </div>
             </div>
 
-            <!-- Información de transcripción en tiempo real -->
             <div id="transcription-info"></div>
 
-            <div class="input-area">
-                <input type="text" id="input" placeholder="Escribe tu mensaje o usa los comandos de voz..." />
+        </main>
+        <div class="input-area-container">
+             <div class="input-area">
+                <input type="text" id="input" placeholder="Escribe o habla..." />
                 <button id="sendBtn" class="icon-button" title="Enviar mensaje">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+         </div>
 
-            <div class="controls">
-                <button id="startBtn" class="control-button">
-                    <i class="fas fa-microphone"></i> Hablar con Gemini
-                </button>
-                <button id="explicitStopBtn" class="control-button" disabled>
-                     <i class="fas fa-microphone-slash"></i> Detener Escucha
-                </button>
-                <button id="pauseBtn" class="control-button" disabled>
-                    <i class="fas fa-pause"></i> Pausar Lectura
-                </button>
-                <button id="resumeBtn" class="control-button" disabled>
-                    <i class="fas fa-play"></i> Reanudar Lectura
-                </button>
-                <button id="stopBtn" class="control-button" disabled>
-                    <i class="fas fa-stop"></i> Detener Lectura
-                </button>
-            </div>
-        </main>
+         <div class="controls">
+             <button id="startBtn" class="control-button">
+                 <i class="fas fa-microphone"></i> Hablar
+             </button>
+             <button id="explicitStopBtn" class="control-button" disabled>
+                 <i class="fas fa-microphone-slash"></i> Detener Mic.
+             </button>
+             <button id="pauseBtn" class="control-button" disabled>
+                 <i class="fas fa-pause"></i> Pausar Voz
+             </button>
+             <button id="resumeBtn" class="control-button" disabled>
+                 <i class="fas fa-play"></i> Reanudar Voz
+             </button>
+             <button id="stopBtn" class="control-button" disabled>
+                 <i class="fas fa-stop"></i> Detener Voz
+             </button>
+         </div>
+
 
         <aside id="configMenu" class="hidden">
             <div class="config-header">
                 <h3>Configuración</h3>
-                <button id="closeConfig" class="icon-button">
+                <button id="closeConfig" class="icon-button" title="Cerrar configuración">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <div class="config-section">
-                <h4>Voz</h4>
-                <label for="voiceSelect">Seleccionar Voz:</label>
+                <h4>Voz (TTS)</h4>
+                <label for="voiceSelect">Voz preferida:</label>
                 <select id="voiceSelect"></select>
             </div>
 
@@ -613,7 +528,7 @@
                 <h4>Velocidad Lectura</h4>
                 <div class="slider-container">
                     <i class="fas fa-walking"></i>
-                    <input type="range" id="rateSelect" min="0.1" max="2" step="0.1" value="1">
+                    <input type="range" id="rateSelect" min="0.5" max="2" step="0.1" value="1">
                     <i class="fas fa-running"></i>
                 </div>
                 <span id="rateValue">1.0</span>
@@ -630,15 +545,15 @@
             </div>
 
             <div class="config-section">
-                <h4>Contexto</h4>
+                <h4>Contexto (Memoria)</h4>
                 <button id="clearContextBtn" class="full-width-btn">
                     <i class="fas fa-trash"></i> Borrar contexto
                 </button>
-                <p class="help-text">Esto eliminará la memoria de la conversación actual.</p>
+                <p class="help-text">Elimina la memoria de la conversación actual.</p>
             </div>
 
             <div class="config-section">
-                <h4>Tema</h4>
+                <h4>Tema Visual</h4>
                 <div class="theme-toggle">
                     <span>Claro</span>
                     <label class="switch">
@@ -652,29 +567,34 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
     <script>
-    // --- Variables Globales ---
-    const API_KEY = "AIzaSyBk2gDvRT_WERHwZW-vuoI_NNnWrOEZ7b8"; // ⚠️ Reemplaza con tu clave API real y protégela
-    let currentSpeech = null; // Holds the current SpeechSynthesisUtterance object
-    let isRecording = false; // User's *intent* to record (set by buttons)
-    let isApiRecognizing = false; // Actual state of the SpeechRecognition API
-    let isSpeaking = false; // Is TTS currently active?
-    let voices = []; // Array to hold available TTS voices
-    let isWaitingForResponse = false; // Is the app waiting for Gemini API response?
-    let wasRecordingBeforeTTS = false; // Flag to remember if recognition was active before TTS
-    let autoScrollEnabled = true; // Control para el auto-scroll
+    // --- Constants & Configuration ---
+    // ⚠️ IMPORTANT: Replace with your actual API key.
+    // Consider using a backend proxy to protect your key in a real application.
+    const API_KEY = "TU_API_KEY_AQUI"; // <--- ¡REEMPLAZA ESTO!
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    const MAX_CONTEXT_MESSAGES = 8; // Max number of *pairs* (user+bot) to keep in history
+    const RECOGNITION_LANG = 'es-ES'; // Language for Speech Recognition
+    const TTS_PREFERRED_LANG = 'es'; // Preferred language prefix for TTS (e.g., 'es-ES', 'es-MX')
+    const INTERIM_UPDATE_THRESHOLD = 300; // ms - Throttle interim transcript UI updates
 
-    // Variables para mantener un registro de las transcripciones en tiempo real
-    let lastInterimTranscriptUpdate = Date.now();
-    let interimTranscriptUpdateThreshold = 200; // ms - para limitar actualizaciones muy frecuentes
-
-    // Variables for special voice commands
-    let isListeningButNotTranscribing = false; // State for the "espera" command
-    let finalTranscript = ''; // Accumulates the definitive transcript segments
-
-    // Conversation history (context)
-    let conversationHistory = [];
-    const MAX_CONTEXT_LENGTH = 10; // Max messages to keep in context (adjust as needed)
+    // --- Global State Variables ---
+    let currentSpeech = null;       // Holds the current SpeechSynthesisUtterance
+    let recognition = null;         // Holds the SpeechRecognition instance
+    let isRecordingIntent = false;  // User *wants* to be recording (button state)
+    let isApiRecognizing = false;   // SpeechRecognition API is *actually* active
+    let isSpeaking = false;         // TTS is currently active
+    let voices = [];                // Available TTS voices
+    let isWaitingForApiResponse = false; // Waiting for Gemini response
+    let wasRecordingBeforeTTS = false; // Remember recognition state before TTS starts
+    let autoScrollEnabled = true;   // Auto-scroll chat
+    let lastInterimUpdateTime = 0;  // Timestamp for throttling interim updates
+    let isListeningPaused = false;  // State for "espera" command
+    let accumulatedFinalTranscript = ''; // Accumulates final transcript segments
+    let conversationHistory = [];   // Stores { role: 'user'/'model', parts: [{ text: '...' }] }
+    let currentTheme = 'light';     // Current visual theme
+    let activeSpeakButton = null;   // Reference to the currently speaking button icon
 
     // --- DOM Elements ---
     const chatElement = document.getElementById('chat');
@@ -698,668 +618,903 @@
     const typingIndicator = document.getElementById('typing-indicator');
     const clearContextBtn = document.getElementById('clearContextBtn');
     const contextIndicator = document.getElementById('contextIndicator');
-    const transcriptionInfo = document.getElementById('transcription-info');
+    const transcriptionInfo = document.getElementById('transcription-info'); // Still exists but won't be shown
 
-    // --- Sound Effects ---
+    // --- Sound Effects (Optional) ---
     const sounds = {
-        send: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'], volume: 0.4 }),
-        receive: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'], volume: 0.4 }),
-        start: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'], volume: 0.4 }),
-        stop: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'], volume: 0.4 })
+        // Using generic UI sounds as examples - replace with better fitting sounds if desired
+        start: new Howl({ src: ['https://cdn.pixabay.com/audio/2022/03/15/audio_bd4d5c269e.mp3'], volume: 0.3 }), // Example: Subtle activation sound
+        stop: new Howl({ src: ['https://cdn.pixabay.com/audio/2021/08/04/audio_a884f8f67c.mp3'], volume: 0.3 }),  // Example: Subtle deactivation sound
+        send: new Howl({ src: ['https://cdn.pixabay.com/audio/2022/03/10/audio_1731f14137.mp3'], volume: 0.4 }),   // Example: Message sent sound
+        receive: new Howl({ src: ['https://cdn.pixabay.com/audio/2022/11/10/audio_1e0a9cec63.mp3'], volume: 0.4 }) // Example: Message received sound
     };
 
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSpeechRecognition();
+        setupSpeechSynthesis();
+        loadTheme(); // Load saved theme preference
+        addEventListeners();
+        updateButtonStates();
+        updateContextIndicator();
+        // Add initial bot message speak button functionality if needed immediately
+        const initialBotMsg = chatElement.querySelector('.bot-message');
+        if (initialBotMsg && !initialBotMsg.querySelector('.speak-button')) {
+             addSpeakButton(initialBotMsg);
+        } else if (initialBotMsg) {
+            // Ensure existing button has correct event listener if HTML was static
+             const btn = initialBotMsg.querySelector('.speak-button');
+             if (btn && !btn.onclick) {
+                 btn.onclick = () => speakMessage(initialBotMsg);
+             }
+        }
+    });
+
     // --- Speech Recognition Setup ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition; // Declare recognition variable
+    function setupSpeechRecognition() {
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognitionAPI) {
+            console.error("Speech Recognition API no soportada.");
+            showSystemMessage("El reconocimiento de voz no está disponible en este navegador.", "error");
+            startBtn.disabled = true;
+            explicitStopBtn.disabled = true;
+            return;
+        }
 
-    if (!SpeechRecognition) {
-        console.error("Speech Recognition API no soportada en este navegador.");
-        alert("Lo siento, tu navegador no soporta el reconocimiento de voz.");
-        startBtn.disabled = true;
-        explicitStopBtn.disabled = true;
-    } else {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'es-ES';
-        recognition.interimResults = true;
-        recognition.continuous = true; // Essential for continuous listening behavior
-        recognition.maxAlternatives = 1;
+        recognition = new SpeechRecognitionAPI();
+        recognition.lang = RECOGNITION_LANG;
+        recognition.interimResults = true; // Get results as they come
+        recognition.continuous = true;     // Keep listening even after pauses
+        recognition.maxAlternatives = 1;   // We only need the best guess
 
-        // --- Speech Recognition Event Handlers ---
         recognition.onstart = () => {
-            isApiRecognizing = true; // Mark that the API is actively listening
-            console.log("Recognition started.");
-            updateButtonStates(); // Reflect the listening state
-            showTranscriptionStatus("Escuchando...");
+            isApiRecognizing = true;
+            console.log("Speech Recognition: Started");
+            // Don't show transcription status message anymore
+            // showTranscriptionStatus("Escuchando...");
+            updateButtonStates();
         };
 
         recognition.onresult = (event) => {
-            // *** IMPORTANT: Ignore results if TTS is speaking ***
-            if (isSpeaking) {
-                console.log("Ignoring recognition result: TTS is active.");
+            // Ignore results if TTS is speaking or if waiting for API
+            if (isSpeaking || isWaitingForApiResponse) {
+                console.log("Speech Recognition: Ignoring result (TTS active or waiting for API).");
                 return;
             }
 
             let interimTranscript = '';
+            // Loop through results from the last recognized index
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 const transcriptPart = event.results[i][0].transcript;
 
                 if (event.results[i].isFinal) {
-                    console.log("Final segment:", transcriptPart);
+                    console.log("Speech Recognition: Final segment received:", transcriptPart);
                     const finalSegmentLower = transcriptPart.toLowerCase().trim();
 
-                    if (!isListeningButNotTranscribing) {
-                        // Command checks ("okay", "espera")
-                        if (finalSegmentLower.endsWith("okay") || finalSegmentLower.endsWith("okey")) {
-                            const commandWord = finalSegmentLower.endsWith("okay") ? "okay" : "okey";
-                            finalTranscript += transcriptPart.substring(0, transcriptPart.toLowerCase().lastIndexOf(commandWord)).trim();
-                            inputField.value = finalTranscript;
-                            showTranscriptionStatus("¡Enviando mensaje!");
-                            console.log(`"Okay" detected. Sending: "${finalTranscript}"`);
-                            if (finalTranscript.trim()) {
-                                sendMessage(finalTranscript);
-                            }
-                            finalTranscript = '';
-                            inputField.value = '';
-                            isListeningButNotTranscribing = false;
-                            return; // Stop processing this result
-                        } else if (finalSegmentLower.includes("espera")) {
-                            finalTranscript += transcriptPart.substring(0, transcriptPart.toLowerCase().lastIndexOf("espera")).trim();
-                            inputField.value = finalTranscript + " [en espera...]";
-                            showTranscriptionStatus("En espera... Di 'continuemos' para reanudar");
-                            isListeningButNotTranscribing = true;
-                            console.log(`"Espera" detected. Pausing transcription. Current: "${finalTranscript}"`);
+                    if (isListeningPaused) {
+                        // Only listen for "continuemos" while paused
+                        if (finalSegmentLower.includes("continuemos") || finalSegmentLower.includes("continua")) {
+                            isListeningPaused = false;
+                            inputField.value = accumulatedFinalTranscript; // Restore accumulated text
+                            // showTranscriptionStatus("Transcripción reanudada");
+                            console.log("Speech Recognition: 'Continuemos' detected. Resuming.");
                             updateButtonStates();
                         } else {
-                            finalTranscript += transcriptPart;
-                            console.log("Appending final segment. Current:", finalTranscript);
-                            showTranscriptionStatus("Transcribiendo...");
+                            console.log("Speech Recognition: Ignoring speech while paused:", transcriptPart);
+                            // showTranscriptionStatus("En espera... Di 'continuemos'");
                         }
-                    } else { // In "espera" mode
-                        if (finalSegmentLower.includes("continuemos")) {
-                            isListeningButNotTranscribing = false;
-                            inputField.value = finalTranscript;
-                            showTranscriptionStatus("Transcripción reanudada");
-                            console.log(`"Continuemos" detected. Resuming transcription. Current: "${finalTranscript}"`);
+                    } else {
+                        // Process regular speech or commands
+                        if (finalSegmentLower.endsWith("okay") || finalSegmentLower.endsWith("okey") || finalSegmentLower.endsWith("listo")) {
+                            const commandWord = finalSegmentLower.endsWith("listo") ? "listo" : (finalSegmentLower.endsWith("okay") ? "okay" : "okey");
+                            // Add the part before the command word
+                            accumulatedFinalTranscript += transcriptPart.substring(0, transcriptPart.toLowerCase().lastIndexOf(commandWord)).trim();
+                            inputField.value = accumulatedFinalTranscript; // Update input field
+                            // showTranscriptionStatus("¡Enviando mensaje!");
+                            console.log(`Speech Recognition: "${commandWord}" detected. Sending: "${accumulatedFinalTranscript}"`);
+                            if (accumulatedFinalTranscript.trim()) {
+                                sendMessage(accumulatedFinalTranscript); // Send the message
+                            }
+                            accumulatedFinalTranscript = ''; // Reset transcript
+                            inputField.value = '';           // Clear input field
+                            isListeningPaused = false;       // Ensure not paused
+                            // Stop recognition momentarily after sending to avoid immediate re-triggering
+                            stopRecognition();
+                            // Optionally restart after a short delay if needed, but manual start is often better
+                            // setTimeout(startRecognition, 500);
+                            return; // Stop processing this event
+                        } else if (finalSegmentLower.includes("espera")) {
+                            // Add the part before "espera"
+                            accumulatedFinalTranscript += transcriptPart.substring(0, transcriptPart.toLowerCase().lastIndexOf("espera")).trim();
+                            inputField.value = accumulatedFinalTranscript + " [en espera...]"; // Show paused state
+                            // showTranscriptionStatus("En espera... Di 'continuemos'");
+                            isListeningPaused = true;
+                            console.log(`Speech Recognition: "Espera" detected. Pausing transcription. Current: "${accumulatedFinalTranscript}"`);
                             updateButtonStates();
                         } else {
-                            console.log("Ignoring speech while in 'espera' mode:", transcriptPart);
-                            showTranscriptionStatus("En espera... Di 'continuemos' para reanudar");
+                            // Regular speech segment
+                            accumulatedFinalTranscript += transcriptPart;
+                            console.log("Speech Recognition: Appending final segment. Current:", accumulatedFinalTranscript);
+                            // showTranscriptionStatus("Transcribiendo...");
                         }
                     }
                 } else { // Interim results
-                    if (!isListeningButNotTranscribing) {
+                    if (!isListeningPaused) {
                         interimTranscript += transcriptPart;
-                        updateTranscriptionInfo(transcriptPart);
+                        // Throttle UI updates for interim results
+                        const now = Date.now();
+                        if (now - lastInterimUpdateTime > INTERIM_UPDATE_THRESHOLD) {
+                           // Don't show the floating message
+                           // updateTranscriptionInfo(transcriptPart);
+                           lastInterimUpdateTime = now;
+                        }
                     }
                 }
             }
-            // Update input field only if not in "espera" mode
-            if (!isListeningButNotTranscribing) {
-                inputField.value = finalTranscript + interimTranscript;
+
+            // Update input field only if not paused
+            if (!isListeningPaused) {
+                inputField.value = accumulatedFinalTranscript + interimTranscript;
                 ensureInputFieldVisible();
             }
         };
 
         recognition.onend = () => {
-            isApiRecognizing = false; // Mark that the API has stopped
-            console.log("Recognition ended. isRecording(intent):", isRecording, "isWaiting:", isWaitingForResponse, "isSpeaking:", isSpeaking);
-            hideTranscriptionStatus();
+            isApiRecognizing = false;
+            console.log("Speech Recognition: Ended. State - Intent:", isRecordingIntent, "Speaking:", isSpeaking, "Waiting:", isWaitingForApiResponse, "Paused:", isListeningPaused);
+            // hideTranscriptionStatus();
 
-            // Don't restart if TTS is speaking (TTS onend will handle it)
-            if (isSpeaking) {
-                console.log("Recognition ended during TTS, waiting for TTS to finish.");
-                updateButtonStates(); // Update button state even if not restarting
-                return;
-            }
-            // Don't restart if waiting for API response
-            if (isWaitingForResponse) {
-                 console.log("Recognition ended while waiting for API response.");
-                 updateButtonStates();
-                 return;
-            }
-            // Only restart if user *intends* to be recording
-            if (isRecording) {
-                console.log("Attempting restart (continuous mode, not speaking/waiting)...");
-                showTranscriptionStatus("Reconectando micrófono...");
-                try {
-                    // Use a small delay to prevent potential rapid restart issues
-                    setTimeout(() => {
-                        // Double-check state before actually starting
-                        if (isRecording && !isSpeaking && !isWaitingForResponse) {
-                            console.log("Executing delayed restart.");
+            // Critical: Only attempt restart if the user *intended* to be recording,
+            // and we are not speaking, waiting for API, or explicitly paused by "espera".
+            if (isRecordingIntent && !isSpeaking && !isWaitingForApiResponse && !isListeningPaused) {
+                console.log("Speech Recognition: Attempting automatic restart...");
+                // Use a small delay to prevent potential rapid error loops if the browser ends it immediately
+                setTimeout(() => {
+                    // Double-check the state *again* before restarting
+                    if (isRecordingIntent && !isApiRecognizing && !isSpeaking && !isWaitingForApiResponse && !isListeningPaused) {
+                        try {
                             recognition.start();
-                            showTranscriptionStatus("Escuchando...");
-                        } else {
-                             console.log("Restart aborted, state changed during delay.");
-                             hideTranscriptionStatus();
-                             // If state changed such that we shouldn't be recording, update buttons
-                             if (!isRecording) updateButtonStates();
+                            console.log("Speech Recognition: Restart successful.");
+                        } catch (error) {
+                            console.error("Speech Recognition: Error on restart:", error);
+                            // Handle potential errors like "not-allowed" if permissions changed
+                            if (error.name === 'NotAllowedError') {
+                                showSystemMessage("Permiso de micrófono denegado. Habilítalo para usar la voz.", "error");
+                                isRecordingIntent = false; // Reset intent as it failed
+                            } else {
+                                showSystemMessage("Error al reiniciar el micrófono.", "error");
+                            }
+                            updateButtonStates(); // Update buttons to reflect failed state
                         }
-                    }, 100);
-                } catch (e) {
-                    console.error("Error restarting recognition:", e);
-                    isRecording = false; // Failed to restart intent
-                    updateButtonStates();
-                    appendMessage('Error al reiniciar el reconocimiento de voz.', 'system-message', true);
-                    hideTranscriptionStatus();
-                }
+                    } else {
+                        console.log("Speech Recognition: Restart aborted due to state change during timeout.");
+                        updateButtonStates(); // Ensure buttons reflect the final state
+                    }
+                }, 250); // Short delay before restart attempt
             } else {
-                // Recognition ended and user intent is NOT to record (manual stop, or error)
-                updateButtonStates(); // Ensure buttons reflect the stopped state
-                console.log("Recognition stopped definitively.");
-                hideTranscriptionStatus();
+                // If not restarting, ensure buttons reflect the stopped state
+                updateButtonStates();
             }
         };
 
         recognition.onerror = (event) => {
-            isApiRecognizing = false; // API stopped due to error
-            console.error('Error en reconocimiento de voz:', event.error, event.message);
+            isApiRecognizing = false; // Ensure state is correct on error
+            console.error("Speech Recognition Error:", event.error, event.message);
+            // hideTranscriptionStatus();
 
-            let wasIntentRecording = isRecording; // Store intent before potentially changing it
-            isRecording = false; // Generally stop intent on error, except maybe 'no-speech'
-            isListeningButNotTranscribing = false;
-            finalTranscript = '';
-
-            let errorMessage = `Error de reconocimiento: ${event.error}.`;
-            if (event.message) errorMessage += ` ${event.message}`;
-
-            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                errorMessage = 'Acceso al micrófono denegado. Por favor, habilita el permiso en tu navegador.';
-                // Keep isRecording false
-            } else if (event.error === 'no-speech') {
-                errorMessage = 'No se detectó voz. Intentando de nuevo...';
-                // For 'no-speech', we might want to let the 'onend' handler restart if continuous mode is desired
-                isRecording = wasIntentRecording; // Restore intent, let onend handle restart if needed
-            } else if (event.error === 'network') {
-                 errorMessage = 'Error de red durante el reconocimiento de voz.';
+            let errorMessage = "Error en el reconocimiento de voz.";
+            if (event.error === 'no-speech') {
+                errorMessage = "No se detectó habla. Intenta de nuevo.";
+                // Don't necessarily stop the *intent* on no-speech, let onend handle restart if needed
             } else if (event.error === 'audio-capture') {
-                 errorMessage = 'Error al capturar audio del micrófono.';
+                errorMessage = "Error al capturar audio. Revisa tu micrófono.";
+                isRecordingIntent = false; // Stop intent if hardware fails
+            } else if (event.error === 'not-allowed') {
+                errorMessage = "Permiso de micrófono denegado.";
+                isRecordingIntent = false; // Stop intent if permission denied
+            } else if (event.error === 'network') {
+                errorMessage = "Error de red durante el reconocimiento.";
+                // Allow potential restart via onend
+            } else {
+                 errorMessage = `Error: ${event.error}`;
+                 isRecordingIntent = false; // Stop on unknown errors
             }
-
-            appendMessage(errorMessage, 'system-message', true);
-            updateButtonStates(); // Update buttons after handling error
-            showTranscriptionStatus("Error: " + errorMessage);
-            setTimeout(hideTranscriptionStatus, 3000);
-
-             // If error is critical, ensure recognition doesn't restart via onend
-            if (event.error === 'not-allowed' || event.error === 'service-not-allowed' || event.error === 'audio-capture') {
-                 isRecording = false; // Force stop intent
-            }
+            showSystemMessage(errorMessage, "error");
+            updateButtonStates();
         };
     }
 
-    // --- Functions for Transcription Status ---
-    function showTranscriptionStatus(message) {
-        if (transcriptionInfo) {
-            transcriptionInfo.textContent = message;
-            transcriptionInfo.classList.add('active');
-        }
-    }
-
-    function hideTranscriptionStatus() {
-        if (transcriptionInfo) {
-            transcriptionInfo.classList.remove('active');
-        }
-    }
-
-    // Función para actualizar la información de transcripción en tiempo real
-    function updateTranscriptionInfo(interimText) {
-        // Limitar la frecuencia de actualización para evitar sobrecarga visual
-        const now = Date.now();
-        if (now - lastInterimTranscriptUpdate < interimTranscriptUpdateThreshold) {
+    // --- Speech Synthesis (TTS) Setup ---
+    function setupSpeechSynthesis() {
+        if (!('speechSynthesis' in window)) {
+            console.error("Speech Synthesis API no soportada.");
+            showSystemMessage("La lectura de voz no está disponible en este navegador.", "error");
+            // Disable TTS related buttons
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = true;
+            stopBtn.disabled = true;
+            // Hide voice config options
+            voiceSelect.parentElement.style.display = 'none';
+            rateSelect.closest('.config-section').style.display = 'none';
+            pitchSelect.closest('.config-section').style.display = 'none';
             return;
         }
-        lastInterimTranscriptUpdate = now;
-        
-        if (interimText && interimText.trim().length > 0) {
-            showTranscriptionStatus("Escuchando: " + interimText.trim());
-        } else {
-            showTranscriptionStatus("Escuchando...");
-        }
-    }
 
-    // --- Initialization Functions ---
-    function loadSavedTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.body.setAttribute('data-theme', savedTheme);
-        if(themeToggle) themeToggle.checked = savedTheme === 'dark';
-    }
-
-    function loadSavedConfig() {
-        loadSavedTheme();
-        const savedRate = localStorage.getItem('rate') || 1;
-        const savedPitch = localStorage.getItem('pitch') || 1;
-        if(rateSelect) rateSelect.value = savedRate;
-        if(pitchSelect) pitchSelect.value = savedPitch;
-        if(rateValue) rateValue.textContent = parseFloat(savedRate).toFixed(1);
-        if(pitchValue) pitchValue.textContent = parseFloat(savedPitch).toFixed(1);
-
-        const savedHistory = localStorage.getItem('conversationHistory');
-        if (savedHistory) {
-            try {
-                conversationHistory = JSON.parse(savedHistory);
-                restoreConversationHistory();
-            } catch (e) {
-                console.error("Error al cargar historial:", e);
-                conversationHistory = [];
-                localStorage.removeItem('conversationHistory');
+        // Ensure any ongoing speech is stopped when the page unloads/reloads
+        window.addEventListener('beforeunload', () => {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
             }
-        }
-        updateContextIndicator();
-    }
-
-    function restoreConversationHistory() {
-        if (!chatElement) return;
-        chatElement.innerHTML = '';
-        conversationHistory.forEach(message => {
-            appendMessageToUI(message.text, message.role === 'user' ? 'user-message' : 'bot-message', true); 
         });
-        scrollToBottom();
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
     }
 
-    function loadVoices() {
+    function populateVoiceList() {
         voices = speechSynthesis.getVoices();
-        if (!voiceSelect) return;
-        voiceSelect.innerHTML = '';
+        voiceSelect.innerHTML = ''; // Clear previous options
 
-        const spanishVoices = voices.filter(voice => voice.lang.startsWith('es'));
-        const otherVoices = voices.filter(voice => !voice.lang.startsWith('es'));
-        const sortedVoices = [...spanishVoices, ...otherVoices];
+        // Prioritize Spanish voices
+        const spanishVoices = voices.filter(voice => voice.lang.startsWith(TTS_PREFERRED_LANG));
+        // Then add other voices
+        const otherVoices = voices.filter(voice => !voice.lang.startsWith(TTS_PREFERRED_LANG));
 
-        let defaultVoiceSelected = false;
-        sortedVoices.forEach((voice, index) => {
+        // Combine, Spanish first
+        const allVoicesSorted = [...spanishVoices, ...otherVoices];
+
+        let defaultVoiceFound = false;
+        allVoicesSorted.forEach(voice => {
             const option = document.createElement('option');
-            option.value = index;
             option.textContent = `${voice.name} (${voice.lang})`;
-            if (!defaultVoiceSelected && voice.lang.startsWith('es')) {
-                 option.selected = true; // Select first Spanish voice
-                 defaultVoiceSelected = true;
-            }
+            option.setAttribute('data-lang', voice.lang);
+            option.setAttribute('data-name', voice.name);
             voiceSelect.appendChild(option);
+
+            // Try to set a default Spanish voice
+            if (!defaultVoiceFound && voice.lang.startsWith(TTS_PREFERRED_LANG)) {
+                 option.selected = true;
+                 defaultVoiceFound = true;
+            }
         });
 
-        const savedVoiceIndex = localStorage.getItem('selectedVoice');
-        if (savedVoiceIndex && parseInt(savedVoiceIndex) < voices.length) {
-            voiceSelect.selectedIndex = parseInt(savedVoiceIndex);
-        } else if (!defaultVoiceSelected && voiceSelect.options.length > 0) {
-             voiceSelect.selectedIndex = 0; // Fallback if no Spanish voice found/saved invalid
-             localStorage.setItem('selectedVoice', 0);
-        } else if (defaultVoiceSelected && !savedVoiceIndex) {
-             // If a default Spanish was selected, save it if nothing was saved previously
-             localStorage.setItem('selectedVoice', voiceSelect.selectedIndex);
+         // If no Spanish voice was found, select the first available voice
+         if (!defaultVoiceFound && voiceSelect.options.length > 0) {
+             voiceSelect.options[0].selected = true;
+         }
+
+        console.log("TTS Voices loaded:", voices.length);
+        if(voices.length === 0) {
+             console.warn("No TTS voices available yet. May need to wait for onvoiceschanged.");
+             // Optionally show a message or disable TTS features until voices load
+        }
+    }
+
+    // --- Core Functions ---
+
+    function startRecognition() {
+        if (!recognition) {
+             console.error("Recognition not initialized.");
+             showSystemMessage("Error al iniciar reconocimiento.", "error");
+             return;
+        }
+        if (isApiRecognizing || isSpeaking || isWaitingForApiResponse) {
+            console.log("Start Recognition: Blocked (already active, speaking, or waiting).");
+            return; // Don't start if already running, speaking, or waiting
         }
 
-        loadSavedConfig(); // Load other configs after voices are populated
+        // Stop any lingering TTS first
+        stopSpeech();
+
+        console.log("Start Recognition: Attempting to start...");
+        isRecordingIntent = true; // Set user intent
+        accumulatedFinalTranscript = ''; // Clear previous transcript
+        isListeningPaused = false;   // Reset paused state
+        inputField.value = '';       // Clear input field visually
+        sounds.start?.play();      // Play start sound
+
+        try {
+            recognition.start();
+            // onstart will set isApiRecognizing = true
+        } catch (error) {
+            console.error("Start Recognition: Error starting -", error);
+            isRecordingIntent = false; // Reset intent on immediate error
+            if (error.name === 'InvalidStateError') {
+                // This might happen if it's somehow already started
+                console.warn("Start Recognition: InvalidStateError, likely already started.");
+                isApiRecognizing = true; // Assume it's running
+            } else {
+                 showSystemMessage("No se pudo iniciar el micrófono.", "error");
+            }
+            updateButtonStates();
+        }
     }
 
-    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = loadVoices;
+    function stopRecognition(playSound = true) {
+        if (!recognition) return;
+
+        console.log("Stop Recognition: Stopping intent and API.");
+        isRecordingIntent = false; // Clear user intent
+        isListeningPaused = false; // Clear paused state
+
+        if (isApiRecognizing) {
+            try {
+                recognition.stop(); // Request the API to stop
+                // onend will set isApiRecognizing = false
+                if (playSound) sounds.stop?.play();
+            } catch (error) {
+                 console.error("Stop Recognition: Error stopping -", error);
+                 // Force state update even if API stop fails
+                 isApiRecognizing = false;
+            }
+        } else {
+            console.log("Stop Recognition: API was not running.");
+        }
+        // hideTranscriptionStatus(); // Hide status immediately
+        updateButtonStates();      // Update buttons immediately
     }
-    loadVoices(); // Initial call
+
+    function sendMessage(messageText = null) {
+        const text = (messageText !== null ? messageText : inputField.value).trim();
+        if (!text || isWaitingForApiResponse) {
+            console.log("Send Message: Blocked (empty or waiting).");
+            return; // Don't send empty messages or while waiting
+        }
+
+        console.log("Send Message: Sending:", text);
+        isWaitingForApiResponse = true; // Set waiting flag
+        showTypingIndicator(true);      // Show thinking indicator
+        updateButtonStates();           // Disable inputs/buttons
+        sounds.send?.play();
+
+        // 1. Display User Message Immediately
+        addMessage(text, 'user');
+        inputField.value = ''; // Clear input field
+        accumulatedFinalTranscript = ''; // Clear transcript buffer
+
+        // 2. Stop recognition while processing/speaking
+        wasRecordingBeforeTTS = isRecordingIntent; // Remember if user was talking
+        stopRecognition(false); // Stop listening (don't play sound)
+
+        // 3. Prepare API Request Body
+        const requestBody = {
+            contents: buildContext(), // Get history + new message
+            generationConfig: {
+                // Optional: Adjust generation parameters if needed
+                // "temperature": 0.7,
+                // "maxOutputTokens": 1024,
+            },
+             safetySettings: [ // Adjust safety settings as needed
+                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+            ]
+        };
+
+        // 4. Make API Call
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Try to get error details from the response body
+                return response.json().then(errData => {
+                    console.error("API Error Response:", errData);
+                    const errorMsg = errData.error?.message || `HTTP error ${response.status}`;
+                    throw new Error(`API Error: ${errorMsg}`);
+                }).catch(() => {
+                    // If parsing JSON fails, throw a generic error
+                    throw new Error(`API Error: HTTP status ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("API Response:", data);
+             // Check for valid response structure and content
+            const botText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (botText) {
+                handleApiResponse(botText);
+            } else if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+                 console.warn("API Response blocked due to safety settings.");
+                 handleApiResponse("[Respuesta bloqueada por configuración de seguridad]", true); // Indicate blockage
+            } else if (data.promptFeedback?.blockReason) {
+                 console.warn("API Prompt blocked:", data.promptFeedback.blockReason);
+                 handleApiResponse(`[Solicitud bloqueada: ${data.promptFeedback.blockReason}]`, true);
+            }
+             else {
+                console.error("API Error: Invalid response format", data);
+                handleApiResponse("[Error: Respuesta inesperada de la API]", true);
+            }
+        })
+        .catch(error => {
+            console.error("API Fetch Error:", error);
+            handleApiResponse(`[Error de conexión: ${error.message}]`, true); // Show error in chat
+        })
+        .finally(() => {
+            // This runs regardless of success or failure, *before* TTS finishes
+            isWaitingForApiResponse = false;
+            showTypingIndicator(false);
+            // Don't updateButtonStates or restart recognition here yet.
+            // handleApiResponse and speakText's onend will manage that.
+            console.log("API Call Finished (Fetch). Waiting for potential TTS.");
+        });
+    }
+
+    function handleApiResponse(botText, isError = false) {
+        // Add bot message to chat and history
+        const botMessageElement = addMessage(botText, 'bot');
+        if (!isError) {
+            sounds.receive?.play();
+        }
+
+        // Speak the response
+        speakText(botText, botMessageElement); // Pass the element to update button state
+
+        // Note: isWaitingForApiResponse is already false here (set in finally block)
+        // updateButtonStates and potential recognition restart happen in speakText's onend callback
+    }
+
+
+    function speakText(text, messageElement) {
+        if (!('speechSynthesis' in window) || !text) {
+            console.log("Speak Text: Skipped (TTS not supported or empty text).");
+            // If TTS isn't supported or text is empty, immediately handle post-response actions
+            finalizeResponseHandling();
+            return;
+        }
+
+        // Stop any currently speaking utterance
+        stopSpeech();
+
+        currentSpeech = new SpeechSynthesisUtterance(text);
+        const selectedVoiceName = voiceSelect.selectedOptions[0]?.getAttribute('data-name');
+        const selectedVoiceLang = voiceSelect.selectedOptions[0]?.getAttribute('data-lang');
+
+        // Find the selected voice object
+        const voice = voices.find(v => v.name === selectedVoiceName && v.lang === selectedVoiceLang);
+        if (voice) {
+            currentSpeech.voice = voice;
+            currentSpeech.lang = voice.lang; // Ensure lang matches the voice
+            console.log("Speak Text: Using voice:", voice.name, voice.lang);
+        } else {
+             // Fallback if selected voice not found (shouldn't happen often)
+             // Try finding *any* Spanish voice
+             const fallbackSpanish = voices.find(v => v.lang.startsWith(TTS_PREFERRED_LANG));
+             if (fallbackSpanish) {
+                 currentSpeech.voice = fallbackSpanish;
+                 currentSpeech.lang = fallbackSpanish.lang;
+                 console.warn("Speak Text: Selected voice not found, using fallback Spanish:", fallbackSpanish.name);
+             } else {
+                 // Absolute fallback to browser default
+                 currentSpeech.lang = RECOGNITION_LANG; // Use recognition lang as a hint
+                 console.warn("Speak Text: Selected voice not found, no Spanish fallback, using browser default.");
+             }
+        }
+
+        currentSpeech.rate = parseFloat(rateSelect.value) || 1;
+        currentSpeech.pitch = parseFloat(pitchSelect.value) || 1;
+
+        // --- Event Handlers for the Utterance ---
+        currentSpeech.onstart = () => {
+            isSpeaking = true;
+            console.log("TTS: Started speaking.");
+            updateButtonStates(); // Update buttons (e.g., enable pause/stop)
+            // Highlight the speak button on the message being read
+            if (messageElement) {
+                activeSpeakButton = messageElement.querySelector('.speak-button i');
+                if (activeSpeakButton) {
+                    activeSpeakButton.classList.remove('fa-volume-up');
+                    activeSpeakButton.classList.add('fa-stop-circle'); // Change icon to stop
+                    activeSpeakButton.parentElement.classList.add('speaking');
+                }
+            }
+        };
+
+        currentSpeech.onend = () => {
+            console.log("TTS: Finished speaking.");
+            isSpeaking = false;
+            currentSpeech = null;
+            resetActiveSpeakButton();
+            finalizeResponseHandling(); // Handle button updates and potential recognition restart
+        };
+
+        currentSpeech.onerror = (event) => {
+            console.error("TTS Error:", event.error);
+            isSpeaking = false;
+            currentSpeech = null;
+            resetActiveSpeakButton();
+            showSystemMessage(`Error al leer: ${event.error}`, "error");
+            finalizeResponseHandling(); // Still need to finalize state
+        };
+
+        currentSpeech.onpause = () => {
+             console.log("TTS: Paused.");
+             isSpeaking = false; // Reflect paused state for button logic
+             updateButtonStates();
+        };
+
+        currentSpeech.onresume = () => {
+             console.log("TTS: Resumed.");
+             isSpeaking = true; // Reflect resumed state
+             updateButtonStates();
+        };
+
+        // Start speaking
+        speechSynthesis.speak(currentSpeech);
+    }
+
+    // Called when TTS ends or errors, or if TTS was skipped
+    function finalizeResponseHandling() {
+        console.log("Finalizing response handling. Was recording before TTS:", wasRecordingBeforeTTS);
+        updateButtonStates(); // Update buttons first
+
+        // Restart recognition ONLY if it was active before TTS started
+        if (wasRecordingBeforeTTS) {
+            console.log("Attempting to restart recognition after TTS.");
+            startRecognition();
+        }
+        wasRecordingBeforeTTS = false; // Reset the flag
+    }
+
+
+    function pauseSpeech() {
+        if (speechSynthesis.speaking && !speechSynthesis.paused) {
+            speechSynthesis.pause();
+        }
+    }
+
+    function resumeSpeech() {
+        if (speechSynthesis.paused) {
+            speechSynthesis.resume();
+        }
+    }
+
+    function stopSpeech() {
+        if (speechSynthesis.speaking || speechSynthesis.paused) {
+            speechSynthesis.cancel(); // Cancels current and queued utterances
+            console.log("TTS: Cancelled.");
+            // onend event should fire after cancel, resetting state there.
+            // If onend doesn't fire reliably after cancel in some browsers,
+            // we might need to manually reset state here too.
+            isSpeaking = false;
+            currentSpeech = null;
+            resetActiveSpeakButton();
+            updateButtonStates(); // Update immediately
+        }
+    }
 
     // --- UI Update Functions ---
-    
-    // Nueva función para agregar mensaje al DOM
-    function appendMessageToUI(message, className, skipHistory = false) {
-        if (!chatElement) return;
+
+    function addMessage(text, sender) {
         const messageDiv = document.createElement('div');
-        const sanitizedMessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        messageDiv.textContent = sanitizedMessage;
-        messageDiv.className = `message ${className}`;
-        
-        // Añadir botón de altavoz solo a mensajes del bot (no a mensajes de sistema o usuario)
-        if (className === 'bot-message') {
-            const speakButton = document.createElement('button');
-            speakButton.className = 'speak-button';
-            speakButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-            speakButton.title = 'Reproducir este mensaje';
-            speakButton.addEventListener('click', () => readSpecificMessage(message));
-            messageDiv.appendChild(speakButton);
+        messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+
+        // Sanitize text before adding to innerHTML to prevent XSS
+        // A simple textContent assignment is safer if no HTML formatting is needed from the bot.
+        // If Markdown or basic HTML is expected, use a sanitizer library (like DOMPurify).
+        // For now, assuming plain text:
+        const textNode = document.createTextNode(text);
+        messageDiv.appendChild(textNode);
+
+        // Add speak button only to bot messages
+        if (sender === 'bot') {
+           addSpeakButton(messageDiv);
         }
-        
+
+        chatElement.appendChild(messageDiv);
+        scrollToBottom();
+
+        // Add to conversation history
+        updateConversationHistory(text, sender);
+
+        return messageDiv; // Return the element for potential use (like attaching TTS)
+    }
+
+     function addSpeakButton(messageElement) {
+        const button = document.createElement('button');
+        button.classList.add('speak-button');
+        button.title = "Leer mensaje";
+        button.innerHTML = '<i class="fas fa-volume-up"></i>'; // Use Font Awesome icon
+        button.onclick = () => speakMessage(messageElement); // Use specific handler
+        messageElement.appendChild(button);
+    }
+
+    // Specific handler for clicking speak buttons on messages
+    function speakMessage(messageElement) {
+         // Extract text content, excluding the button itself
+         const textToSpeak = Array.from(messageElement.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE) // Get only text nodes
+            .map(node => node.textContent.trim())
+            .join(' '); // Join multiple text nodes if any
+
+        if (textToSpeak) {
+            console.log("Speaking message:", textToSpeak);
+             // If another message is speaking, stop it first
+            if (isSpeaking && activeSpeakButton && activeSpeakButton.parentElement.parentElement !== messageElement) {
+                stopSpeech();
+                 // Small delay to ensure the previous speech stops before starting new one
+                setTimeout(() => speakText(textToSpeak, messageElement), 100);
+            } else if (isSpeaking && activeSpeakButton && activeSpeakButton.parentElement.parentElement === messageElement) {
+                 // If clicking the button of the currently speaking message, stop it
+                 stopSpeech();
+            }
+            else {
+                speakText(textToSpeak, messageElement);
+            }
+        }
+    }
+
+     function resetActiveSpeakButton() {
+        if (activeSpeakButton) {
+            activeSpeakButton.classList.remove('fa-stop-circle');
+            activeSpeakButton.classList.add('fa-volume-up');
+            if (activeSpeakButton.parentElement) {
+                 activeSpeakButton.parentElement.classList.remove('speaking');
+            }
+            activeSpeakButton = null;
+        }
+    }
+
+
+    function showSystemMessage(text, type = "info") { // type can be 'info' or 'error'
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('system-message');
+        if (type === 'error') {
+            messageDiv.style.color = '#dc3545'; // Use a distinct error color
+            messageDiv.style.fontWeight = 'bold';
+        }
+        messageDiv.textContent = text;
         chatElement.appendChild(messageDiv);
         scrollToBottom();
     }
 
-    // Hacer scroll al último mensaje o zona de input
+    function showTypingIndicator(show) {
+        typingIndicator.classList.toggle('hidden', !show);
+        if (show) scrollToBottom();
+    }
+
     function scrollToBottom() {
-        if (autoScrollEnabled && chatContainer) {
-            setTimeout(() => {
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 50); // Pequeño delay para asegurar que el DOM está actualizado
+        if (autoScrollEnabled) {
+            // Use smooth scrolling
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     }
 
-    // Asegurarse de que el campo de entrada esté visible
+    // Ensure input field is visible when typing long messages (especially on mobile)
     function ensureInputFieldVisible() {
-        scrollToBottom();
+        // This is a simple approach; more complex logic might be needed
+        // depending on exact layout and keyboard behavior.
+        inputField.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function appendMessage(message, className, isSystemMessage = false) {
-        if (!chatElement) return;
-        
-        // Añadir mensaje a la UI
-        appendMessageToUI(message, className);
 
-        // Guardar en el historial si no es un mensaje del sistema
-        if (!isSystemMessage) {
-            const role = className === 'user-message' ? 'user' : 'model';
-            conversationHistory.push({ role, text: message }); // Store original for history
-            if (conversationHistory.length > MAX_CONTEXT_LENGTH) {
-                conversationHistory = conversationHistory.slice(-MAX_CONTEXT_LENGTH);
-            }
-            localStorage.setItem('conversationHistory', JSON.stringify(conversationHistory));
-            updateContextIndicator();
+    function updateButtonStates() {
+        // --- Recognition Buttons ---
+        // Start button enabled if NOT recording intent, NOT speaking, and NOT waiting
+        startBtn.disabled = isRecordingIntent || isSpeaking || isWaitingForApiResponse;
+        // Explicit Stop button enabled ONLY if recording intent is active
+        explicitStopBtn.disabled = !isRecordingIntent;
+
+        // --- TTS Buttons ---
+        // Pause enabled ONLY if actively speaking (not paused)
+        pauseBtn.disabled = !isSpeaking || speechSynthesis.paused;
+        // Resume enabled ONLY if speech is paused
+        resumeBtn.disabled = !speechSynthesis.paused;
+        // Stop enabled if speaking OR paused
+        stopBtn.disabled = !isSpeaking && !speechSynthesis.paused;
+
+        // --- Send Button ---
+        // Send button enabled if NOT waiting for API response
+        sendBtn.disabled = isWaitingForApiResponse;
+        // Also disable if input is empty (optional, good UX)
+        // sendBtn.disabled = isWaitingForApiResponse || inputField.value.trim() === '';
+
+        // --- Input Field ---
+        // Disable input field while waiting for response
+        inputField.disabled = isWaitingForApiResponse;
+
+        // --- Config Button ---
+        // Config button usually always enabled, unless maybe during critical operation
+        toggleConfigBtn.disabled = false; // Example: Keep it enabled
+
+        // --- "Espera" state visual cue (optional) ---
+        if (isListeningPaused) {
+             startBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> Esperando...';
+             startBtn.disabled = true; // Disable start while paused
+             explicitStopBtn.disabled = false; // Allow stopping while paused
+        } else if (!startBtn.disabled) {
+             startBtn.innerHTML = '<i class="fas fa-microphone"></i> Hablar';
         }
 
-        // Reproducir sonidos y hablar si es un mensaje del bot
-        if (!isSystemMessage) {
-            if (className === 'user-message') {
-                sounds.send.play();
-            } else if (className === 'bot-message') {
-                sounds.receive.play();
-                readAloud(message); // Trigger TTS
-            }
-        }
+         console.log("Buttons Updated: RecIntent:", isRecordingIntent, "RecAPI:", isApiRecognizing, "Speak:", isSpeaking, "Wait:", isWaitingForApiResponse, "PausedTTS:", speechSynthesis.paused, "PausedListen:", isListeningPaused);
     }
 
-    // Nueva función para leer un mensaje específico
-    function readSpecificMessage(message) {
-        if (isSpeaking) {
-            // Si ya está hablando, detener la reproducción actual
-            window.speechSynthesis.cancel();
-            currentSpeech = null;
-            isSpeaking = false;
-            updateButtonStates();
-        }
-        
-        // Un pequeño retraso para asegurarse de que se detuvo la reproducción anterior
-        setTimeout(() => {
-            readAloud(message, true); // El segundo parámetro indica que es una lectura específica
-        }, 100);
+    // --- Transcription Status (REMOVED VISUALS) ---
+    function showTranscriptionStatus(message) {
+        // NO VISUAL UPDATE - Keep console log for debugging
+        console.log("Transcription Status:", message);
+        // transcriptionInfo.textContent = message;
+        // transcriptionInfo.classList.add('active');
     }
 
-    function updateContextIndicator() {
-        if (contextIndicator) {
-            const count = conversationHistory.length;
-            contextIndicator.textContent = `Contexto: ${count} mensajes`;
-            contextIndicator.classList.remove('empty', 'medium', 'full');
-            if (count === 0) contextIndicator.classList.add('empty');
-            else if (count < MAX_CONTEXT_LENGTH / 2) contextIndicator.classList.add('medium');
-            else contextIndicator.classList.add('full');
-        }
+    function updateTranscriptionInfo(interimText) {
+         // NO VISUAL UPDATE - Keep console log for debugging
+         console.log("Interim Transcript:", interimText);
+        // Limit length to prevent overflow
+        // const maxLength = 50;
+        // const displayText = interimText.length > maxLength ? '...' + interimText.slice(-maxLength) : interimText;
+        // transcriptionInfo.textContent = `"${displayText}"`;
+        // transcriptionInfo.classList.add('active'); // Keep it visible while updating
+    }
+
+    function hideTranscriptionStatus() {
+         // NO VISUAL UPDATE
+        // transcriptionInfo.classList.remove('active');
+    }
+
+    // --- Configuration Menu ---
+    function toggleConfigMenu() {
+        configMenu.classList.toggle('hidden');
+        // Optional: Add overlay or disable main content interaction when menu is open
+    }
+
+    // --- Theme Management ---
+    function applyTheme(theme) {
+        document.body.setAttribute('data-theme', theme);
+        currentTheme = theme;
+        // Update user message text color based on theme for better contrast
+        document.body.style.setProperty('--theme', theme);
+    }
+
+    function toggleTheme() {
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        applyTheme(newTheme);
+        localStorage.setItem('chatTheme', newTheme); // Save preference
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('chatTheme') || 'light'; // Default to light
+        applyTheme(savedTheme);
+        themeToggle.checked = savedTheme === 'dark';
+    }
+
+    // --- Context / Conversation History ---
+    function buildContext() {
+        // Get the last N messages, ensuring pairs of user/model if possible
+        const context = conversationHistory.slice(-MAX_CONTEXT_MESSAGES * 2); // Get up to N pairs
+
+        // Add the current user message (which was just added to chat)
+        const currentUserMessage = context[context.length - 1]; // Assumes last added was user
+
+        console.log("Building Context with:", context);
+        return context;
+    }
+
+    function updateConversationHistory(text, role) {
+         // Ensure role is 'user' or 'model' as expected by the API
+         const apiRole = (role === 'user') ? 'user' : 'model';
+
+         conversationHistory.push({
+             role: apiRole,
+             parts: [{ text: text }]
+         });
+
+         // Limit history size
+         if (conversationHistory.length > MAX_CONTEXT_MESSAGES * 2) {
+             // Remove the oldest *pair* (user + model message)
+             conversationHistory.splice(0, 2);
+             console.log("Context trimmed. New length:", conversationHistory.length);
+         }
+         updateContextIndicator();
     }
 
     function clearContext() {
         conversationHistory = [];
-        localStorage.removeItem('conversationHistory');
+        chatElement.innerHTML = ''; // Clear visual chat
+        // Add back the initial bot message
+        addMessage("¡Hola! Soy Gemini. Puedes hablarme usando el botón del micrófono o escribir tu mensaje.", 'bot');
+        showSystemMessage("Contexto borrado.", "info");
         updateContextIndicator();
-        appendMessage('Contexto borrado.', 'system-message', true);
+        console.log("Conversation history cleared.");
+        // Optionally close config menu
+        // configMenu.classList.add('hidden');
     }
 
-    function showTypingIndicator() { if(typingIndicator) typingIndicator.classList.remove('hidden'); scrollToBottom(); }
-    function hideTypingIndicator() { if(typingIndicator) typingIndicator.classList.add('hidden'); }
+     function updateContextIndicator() {
+        const messageCount = conversationHistory.length;
+        const pairs = Math.floor(messageCount / 2); // Count pairs
 
-    function updateButtonStates() {
-        const recognitionActive = isApiRecognizing; // Use actual API state for display
-        const ttsSpeaking = isSpeaking;
-        const ttsPaused = currentSpeech && window.speechSynthesis.paused;
+        contextIndicator.textContent = `Contexto: ${pairs} pares`; // Show pairs
 
-        if (startBtn) startBtn.disabled = recognitionActive || isWaitingForResponse || ttsSpeaking; // Disable if listening, waiting, or speaking
-        if (explicitStopBtn) explicitStopBtn.disabled = !recognitionActive && !isRecording; // Enable if API active OR if intent is true but API stopped (e.g., during TTS)
-
-        if (pauseBtn) pauseBtn.disabled = !ttsSpeaking || ttsPaused;
-        if (resumeBtn) resumeBtn.disabled = !ttsPaused;
-        if (stopBtn) stopBtn.disabled = !ttsSpeaking && !ttsPaused; // Can stop TTS if speaking or paused
-
-        if (startBtn) {
-            if (recognitionActive) { // Based on actual API state
-                 if (isListeningButNotTranscribing) {
-                    startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> En espera...';
-                 } else {
-                    startBtn.innerHTML = '<i class="fas fa-microphone-alt"></i> Escuchando...';
-                 }
-            } else {
-                 startBtn.innerHTML = '<i class="fas fa-microphone"></i> Hablar con Gemini';
-            }
+        // Update color based on fullness (adjust thresholds as needed)
+        contextIndicator.classList.remove('empty', 'medium', 'full');
+        if (pairs === 0) {
+            contextIndicator.classList.add('empty');
+            contextIndicator.title = "Contexto vacío";
+        } else if (pairs < MAX_CONTEXT_MESSAGES * 0.6) { // Less than 60% full
+             contextIndicator.classList.add('medium');
+             contextIndicator.title = `Contexto (${pairs}/${MAX_CONTEXT_MESSAGES} pares)`;
+        } else { // 60% full or more
+            contextIndicator.classList.add('full');
+             contextIndicator.title = `Contexto (${pairs}/${MAX_CONTEXT_MESSAGES} pares)`;
         }
     }
 
-    // --- Core Logic Functions ---
-    function sendMessage(userInput) {
-        const trimmedInput = userInput.trim();
-        if (!trimmedInput) return;
-        if(inputField) inputField.value = '';
-
-        appendMessage(trimmedInput, 'user-message');
-
-        // Local commands check
-        if (trimmedInput.toLowerCase().match(/hora|tiempo|qué hora/)) {
-            try { appendMessage(`La hora es: ${obtenerHora()}`, 'bot-message'); return; }
-            catch (error) { console.error("Error hora:", error); }
-        }
-        if (trimmedInput.toLowerCase().match(/borrar contexto|olvidar|nueva conversación/)) {
-            clearContext(); return;
-        }
-
-        // Send to API
-        showTypingIndicator();
-        isWaitingForResponse = true;
-        updateButtonStates();
-
-        const messages = prepareMessagesWithContext(); // Prepare context
-
-        fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: messages })
-        })
-        .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
-        .then(data => {
-            const respuesta = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se pudo obtener respuesta.';
-            appendMessage(respuesta, 'bot-message');
-        })
-        .catch(error => {
-            console.error("Error API:", error);
-            const errorMsg = error?.error?.message || error?.message || 'Error desconocido.';
-            appendMessage(`Error API: ${errorMsg}`, 'system-message', true);
-        })
-        .finally(() => {
-            hideTypingIndicator();
-            isWaitingForResponse = false;
-            finalTranscript = ''; // Clear buffer after attempt
-            updateButtonStates();
-            // Recognition restart (if needed) is handled by recognition.onend
-        });
-    }
-
-    // Prepare context for API - Simplified
-    function prepareMessagesWithContext() {
-        const messages = [
-             // System prompts first
-            { role: "user", parts: [{ text: "Eres un asistente virtual llamado Gemini 2.0 Flash. Responde concisa y amigablemente en español." }] },
-            { role: "model", parts: [{ text: "Entendido. Soy Gemini 2.0 Flash. ¿Cómo puedo ayudarte?" }] }
-        ];
-
-        // Add conversation history directly
-        conversationHistory.forEach(message => {
-            messages.push({
-                role: message.role, // 'user' or 'model'
-                parts: [{ text: message.text }]
-            });
-        });
-        return messages;
-    }
-
-    // --- Text-to-Speech (TTS) Functions ---
-    function readAloud(text, isSpecificMessage = false) {
-        if (!('speechSynthesis' in window) || !text) {
-             if (!('speechSynthesis' in window)) console.error('TTS no soportado.');
-            return;
-        }
-
-        window.speechSynthesis.cancel(); // Cancel previous
-
-        // Solo detiene el reconocimiento si no es una lectura específica
-        if (!isSpecificMessage && recognition) {
-            // Stop recognition temporarily if it's running
-            wasRecordingBeforeTTS = isRecording; // Store user intent
-            if (isApiRecognizing) { // Check actual API state
-                try {
-                    recognition.stop(); // Stop API listening
-                    console.log("Temporarily stopping recognition for TTS.");
-                } catch(e) { console.error("Error stopping recognition for TTS:", e); }
-            }
-        } else {
-            // Si es una lectura específica, recordar que no estábamos grabando antes
-            wasRecordingBeforeTTS = false;
-        }
-
-        currentSpeech = new SpeechSynthesisUtterance(text);
-        const selectedVoiceIndex = voiceSelect ? parseInt(voiceSelect.value) : 0;
-        if (voices[selectedVoiceIndex]) {
-            currentSpeech.voice = voices[selectedVoiceIndex];
-        } else if (voices.length > 0) {
-            currentSpeech.voice = voices[0]; // Fallback
-        }
-        if(rateSelect) currentSpeech.rate = parseFloat(rateSelect.value);
-        if(pitchSelect) currentSpeech.pitch = parseFloat(pitchSelect.value);
-
-        currentSpeech.onstart = () => {
-            console.log("TTS started");
-            isSpeaking = true;
-            updateButtonStates();
-        };
-
-        const handleSpeechEnd = (errorOccurred = false) => {
-            console.log(errorOccurred ? "TTS error occurred" : "TTS finished");
-            isSpeaking = false;
-            currentSpeech = null;
-            updateButtonStates();
-
-            // Solo reinicia el reconocimiento si no era una lectura específica
-            if (!isSpecificMessage && recognition) {
-                // Restart recognition ONLY if user intent was 'recording' before TTS started
-                if (wasRecordingBeforeTTS && isRecording) {
-                    console.log("Attempting to restart recognition after TTS.");
-                    try {
-                        // Check again before starting, user might have clicked stop during TTS
-                        if (isRecording && !isApiRecognizing) {
-                            setTimeout(() => { // Delay slightly
-                                if (isRecording && !isApiRecognizing) recognition.start();
-                            }, 50);
-                        }
-                    } catch (e) {
-                        console.error("Error restarting recognition after TTS:", e);
-                        isRecording = false; // Update intent if restart fails
-                        updateButtonStates();
-                    }
-                }
-            }
-            wasRecordingBeforeTTS = false; // Reset flag
-        };
-
-        currentSpeech.onend = () => handleSpeechEnd(false);
-        currentSpeech.onerror = (event) => {
-            console.error('TTS Error:', event);
-            appendMessage(`Error al hablar: ${event.error}`, 'system-message', true);
-            handleSpeechEnd(true); // Also handle end logic on error
-        };
-
-        window.speechSynthesis.speak(currentSpeech);
-    }
-
-    function pauseReading() { if (isSpeaking && !window.speechSynthesis.paused) { window.speechSynthesis.pause(); updateButtonStates(); } }
-    function resumeReading() { if (window.speechSynthesis.paused) { window.speechSynthesis.resume(); updateButtonStates(); } }
-    function stopReading() {
-        if (isSpeaking || window.speechSynthesis.paused) {
-            window.speechSynthesis.cancel(); // This will trigger onend/onerror which handles state
-            sounds.stop.play();
-            // State (isSpeaking, currentSpeech) is reset in onend/onerror handler
-        }
-    }
 
     // --- Event Listeners ---
-    if(startBtn && recognition) {
-        startBtn.addEventListener('click', () => {
-            // Can start only if NOT waiting, NOT already listening, and NOT speaking
-            if (!isWaitingForResponse && !isApiRecognizing && !isSpeaking) {
-                finalTranscript = "";
-                if(inputField) inputField.value = "";
-                isListeningButNotTranscribing = false;
-                isRecording = true; // Set user intent to record
-                try {
-                    recognition.start();
-                    sounds.start.play();
-                    console.log("Attempting to start recognition via button...");
-                } catch(e) {
-                    console.error("Error starting recognition:", e);
-                    isRecording = false; // Revert intent on immediate error
-                    appendMessage('Error al iniciar reconocimiento.', 'system-message', true);
-                }
-                updateButtonStates(); // Update UI immediately
-            } else {
-                 console.log("Cannot start recognition. State:", {isWaitingForResponse, isApiRecognizing, isSpeaking});
+    function addEventListeners() {
+        // Input Field: Send on Enter
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent newline
+                sendMessage();
             }
         });
-    }
 
-    if(explicitStopBtn && recognition) {
-        explicitStopBtn.addEventListener('click', () => {
-            if (isRecording || isApiRecognizing) { // If user intends to record OR if API is active
-                isRecording = false; // Clear user intent
-                wasRecordingBeforeTTS = false; // Prevent TTS from restarting it
-                try {
-                    if (isApiRecognizing) recognition.stop(); // Stop API if it's running
-                } catch(e) { console.error("Error stopping recognition:", e); }
-                sounds.stop.play();
-                updateButtonStates();
-                hideTranscriptionStatus();
-                console.log("Explicitly stopped recognition by user.");
-            }
+        // Send Button
+        sendBtn.addEventListener('click', () => sendMessage());
+
+        // Recognition Buttons
+        startBtn.addEventListener('click', startRecognition);
+        explicitStopBtn.addEventListener('click', () => stopRecognition(true)); // Play sound on explicit stop
+
+        // TTS Control Buttons
+        pauseBtn.addEventListener('click', pauseSpeech);
+        resumeBtn.addEventListener('click', resumeSpeech);
+        stopBtn.addEventListener('click', stopSpeech);
+
+        // Config Menu Toggle
+        toggleConfigBtn.addEventListener('click', toggleConfigMenu);
+        closeConfigBtn.addEventListener('click', toggleConfigMenu);
+
+        // Config Options
+        voiceSelect.addEventListener('change', () => {
+            // Stop current speech if voice changes
+            stopSpeech();
+            console.log("Voice changed to:", voiceSelect.selectedOptions[0]?.textContent);
         });
-    }
+        rateSelect.addEventListener('input', () => {
+            rateValue.textContent = parseFloat(rateSelect.value).toFixed(1);
+            // Dynamically update rate if speaking? (Can be jarring)
+            // if (currentSpeech) currentSpeech.rate = parseFloat(rateSelect.value);
+        });
+        pitchSelect.addEventListener('input', () => {
+            pitchValue.textContent = parseFloat(pitchSelect.value).toFixed(1);
+            // if (currentSpeech) currentSpeech.pitch = parseFloat(pitchSelect.value);
+        });
+        clearContextBtn.addEventListener('click', clearContext);
+        themeToggle.addEventListener('change', toggleTheme);
 
-    if(pauseBtn) pauseBtn.addEventListener('click', pauseReading);
-    if(resumeBtn) resumeBtn.addEventListener('click', resumeReading);
-    if(stopBtn) stopBtn.addEventListener('click', stopReading);
-
-    if(sendBtn) sendBtn.addEventListener('click', () => { if(inputField) sendMessage(inputField.value); });
-    if(inputField) inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(inputField.value); } });
-
-    // Config listeners
-    if(rateSelect) rateSelect.addEventListener('input', () => { const r = rateSelect.value; localStorage.setItem('rate', r); if(rateValue) rateValue.textContent = parseFloat(r).toFixed(1); });
-    if(pitchSelect) pitchSelect.addEventListener('input', () => { const p = pitchSelect.value; localStorage.setItem('pitch', p); if(pitchValue) pitchValue.textContent = parseFloat(p).toFixed(1); });
-    if(voiceSelect) voiceSelect.addEventListener('change', () => { localStorage.setItem('selectedVoice', voiceSelect.selectedIndex); });
-    if(toggleConfigBtn) toggleConfigBtn.addEventListener('click', () => { if(configMenu) { configMenu.classList.toggle('hidden'); configMenu.style.visibility = configMenu.classList.contains('hidden') ? 'hidden' : 'visible'; } });
-    if(closeConfigBtn) closeConfigBtn.addEventListener('click', () => { if(configMenu) { configMenu.classList.add('hidden'); configMenu.style.visibility = 'hidden'; } });
-    if(themeToggle) themeToggle.addEventListener('change', () => { const th = themeToggle.checked ? 'dark' : 'light'; document.body.setAttribute('data-theme', th); localStorage.setItem('theme', th); });
-    if(clearContextBtn) clearContextBtn.addEventListener('click', clearContext);
-
-    // Listener para manejo de scroll automático
-    if (chatContainer) {
+        // Auto-scroll control (disable on manual scroll)
+        let scrollTimeout;
         chatContainer.addEventListener('scroll', () => {
-            // Si el usuario hace scroll manual, verificar si está cerca del fondo
-            const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 50;
-            autoScrollEnabled = isNearBottom;
+            clearTimeout(scrollTimeout);
+            const isScrolledToBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 50; // Allow tolerance
+             // Temporarily disable auto-scroll if user scrolls up significantly
+            if (!isScrolledToBottom) {
+                 autoScrollEnabled = false;
+                 console.log("Auto-scroll disabled by user.");
+            }
+             // Re-enable auto-scroll after a delay if user stops scrolling near bottom
+             scrollTimeout = setTimeout(() => {
+                  const stillNearBottom = chatContainer.scrollHeight - chatContainer.clientHeight <= chatContainer.scrollTop + 50;
+                 if (stillNearBottom) {
+                     autoScrollEnabled = true;
+                     console.log("Auto-scroll re-enabled.");
+                 }
+             }, 500); // Adjust delay as needed
         });
     }
 
-    // --- Initial Setup ---
-    window.addEventListener('DOMContentLoaded', () => {
-        // loadVoices already called, applies saved config
-        setTimeout(() => {
-            if (conversationHistory.length === 0) {
-                appendMessage('¡Hola! Soy Gemini 2.0 Flash. Haz clic en "Hablar con Gemini" o escribe. Usa "okay" para enviar por voz, "espera" y "continuemos" para pausar/reanudar la transcripción. Puedes reproducir mis mensajes con el botón de altavoz.', 'bot-message');
-            }
-             updateButtonStates(); // Set initial button states
-        }, 500);
-    });
-
-    // --- Utility Functions ---
-    function obtenerHora() {
-        return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    }
     </script>
 </body>
 </html>
